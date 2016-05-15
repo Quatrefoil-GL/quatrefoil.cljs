@@ -29,9 +29,12 @@
 
 (defn expand-comp [markup coord]
   (let [r1 (:render markup)
-        r2 (r1 default-state default-mutate)
-        r3 (r2 default-instant default-tick)
-        tree (expand-element r3 coord)]
+        r2 (r1
+             default-state
+             default-mutate
+             default-instant
+             default-tick)
+        tree (expand-element r2 coord)]
     tree))
 
 (defn expand-markup [markup coord]

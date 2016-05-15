@@ -3,9 +3,11 @@ ns quatrefoil.alias
 
 defn create-element (element-name props children)
   {} (:type :element)
+    :name element-name
+    :args $ :args props
     :attrs $ :attrs props
     :event $ :event props
-    :matertial $ :material props
+    :material $ :material props
     :children $ ->> children
       map-indexed $ fn (index child)
         [] index child
@@ -24,11 +26,8 @@ defn scene (props & children)
 defn light (props & children)
   create-element :light props children
 
-defn camera (props & children)
-  create-element :camara props children
-
 defn group (props & children)
   create-element :group props children
 
-defn cube (props & children)
-  create-element :cube props children
+defn box (props & children)
+  create-element :box props children

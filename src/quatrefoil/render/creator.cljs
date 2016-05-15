@@ -1,2 +1,0 @@
-
-(ns quatrefoil.render.creator)

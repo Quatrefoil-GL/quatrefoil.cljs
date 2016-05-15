@@ -1,15 +1,18 @@
 
 ns quatrefoil.component.container $ :require
-  [] quatrefoil.alias :refer $ [] scene light camera cube group create-comp
+  [] quatrefoil.alias :refer $ [] scene light box group create-comp
 
 defn render (store)
-  fn (state mutate)
-    fn (instant tick)
-      scene ({})
-        camera $ {}
-        group ({})
-          light $ {}
-        group ({})
-          cube $ {}
+  fn
+    state mutate instant tick
+    scene ({})
+      light $ {}
+        :args $ [] 0xffffff 1.2 200
+        :attrs $ {}
+          :position $ [] 40 20 10
+
+      box $ {}
+        :material $ {} (:kind :lambert)
+        :args $ [] 5 5 5
 
 def comp-container $ create-comp :container render

@@ -2,14 +2,16 @@
 (ns quatrefoil.alias)
 
 (defn create-element [element-name props children]
-  {:children
+  {:args (:args props),
+   :children
    (->>
      children
      (map-indexed (fn [index child] [index child]))
      (into (sorted-map))),
-   :matertial (:material props),
+   :name element-name,
    :type :element,
    :event (:event props),
+   :material (:material props),
    :attrs (:attrs props)})
 
 (defn create-comp [comp-name render-method]
@@ -23,8 +25,6 @@
 
 (defn light [props & children] (create-element :light props children))
 
-(defn camera [props & children] (create-element :camara props children))
-
 (defn group [props & children] (create-element :group props children))
 
-(defn cube [props & children] (create-element :cube props children))
+(defn box [props & children] (create-element :box props children))
