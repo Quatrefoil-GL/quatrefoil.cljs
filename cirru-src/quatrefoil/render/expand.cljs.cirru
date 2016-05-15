@@ -14,8 +14,8 @@ def default-tick 0
 defn default-mutate $
 
 defn expand-element (markup coord)
-  -> markup $ update :children
-    fn (children)
+  -> markup
+    update :children $ fn (children)
       ->> children
         map $ fn (entry)
           let
@@ -25,12 +25,17 @@ defn expand-element (markup coord)
 
         into $ sorted-map
 
+    assoc :coord coord
+
 defn expand-comp (markup coord)
   let
     (r1 $ :render markup)
       r2 $ r1 default-state default-mutate default-instant default-tick
-      tree $ expand-element r2 coord
-    , tree
+      new-coord $ conj coord (:name markup)
+      tree $ expand-element r2
+        conj coord $ :name markup
+
+    assoc markup :tree tree :coord new-coord
 
 defn expand-markup (markup coord)
   if

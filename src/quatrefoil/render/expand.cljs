@@ -25,7 +25,8 @@
              (let [child-key (key entry) child (val entry)]
                [child-key
                 (expand-markup child (conj coord child-key))])))
-         (into (sorted-map)))))))
+         (into (sorted-map)))))
+   (assoc :coord coord)))
 
 (defn expand-comp [markup coord]
   (let [r1 (:render markup)
@@ -34,8 +35,9 @@
              default-mutate
              default-instant
              default-tick)
-        tree (expand-element r2 coord)]
-    tree))
+        new-coord (conj coord (:name markup))
+        tree (expand-element r2 (conj coord (:name markup)))]
+    (assoc markup :tree tree :coord new-coord)))
 
 (defn expand-markup [markup coord]
   (if (= :component (:type markup))

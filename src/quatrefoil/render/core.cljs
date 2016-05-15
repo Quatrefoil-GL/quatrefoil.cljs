@@ -13,23 +13,28 @@
              :light
              (let [[color intensity distance] (:args markup)
                    attrs (:attrs markup)
-                   position (or (:position attrs) [10 10 10])
-                   [x y z] position
                    light (THREE.PointLight. color intensity distance)]
-               (println "light position:" position color)
-               (.set light.position x y y)
                light)
              :group
-             (THREE.Object3D.)
+             (THREE.Group.)
              (let [geometry (render-geometry-dsl
                               (:name markup)
                               (:args markup))
                    material (render-material-dsl (:material markup))
                    mesh (THREE.Mesh. geometry material)]
-               mesh))]
+               mesh))
+        attrs (:attrs markup)]
     (doseq [child-entry (:children markup)]
       (.add el (render-markup (val child-entry))))
-    (.log js/console "result of el:" el)
+    (comment .log js/console "result of el:" el)
+    (if (contains? attrs :position)
+      (let [[x y z] (:position attrs)] (.set el.position x y z)))
+    (if (contains? attrs :quaternion)
+      (let [[x y z w] (:quaternion attrs)]
+        (.set el.quaternion x y z w)))
+    (if (contains? attrs :rotation)
+      (let [[x y z] (:rotation attrs)] (.set el.rotation x y z)))
+    (set! el.name (pr-str (:coord markup)))
     el))
 
 (defn render-component [markup] (render-element (:tree markup)))

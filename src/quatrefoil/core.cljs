@@ -13,13 +13,13 @@
   (let [tree (expand-app (comp-container @store-ref))
         target (.querySelector js/document "#app")
         renderer (THREE.WebGLRenderer. (js-obj "canvas" target))
-        w 800
-        h 400
+        w 600
+        h 800
         scene (render-markup tree)
-        camera (THREE.PerspectiveCamera. 35 (/ w h) 0.1 1000)]
+        camera (THREE.PerspectiveCamera. 40 (/ w h) 0.1 1000)]
     (.log js/console "tree:" tree)
     (.log js/console "render scene:" scene)
-    (.set camera.position -15 10 15)
+    (.set camera.position 0 0 30)
     (.lookAt camera scene.position)
     (.setSize renderer w h)
     (.setClearColor renderer 0xdddddd 1)

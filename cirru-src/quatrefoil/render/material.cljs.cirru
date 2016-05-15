@@ -16,4 +16,6 @@ defn render-material-dsl (dsl)
 
     case kind
       :lambert $ THREE.MeshLambertMaterial. js-params
+      :line-basic $ THREE.LineBasicMaterial. js-params
+      :mesh-basic $ THREE.MeshBasicMaterial. js-params
       throw $ str "|Material not found:" kind

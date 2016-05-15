@@ -28,3 +28,5 @@
 (defn group [props & children] (create-element :group props children))
 
 (defn box [props & children] (create-element :box props children))
+
+(defn sphere [props & children] (create-element :sphere props children))

@@ -6,7 +6,8 @@
   (case
     kind
     :box
-    (let [[x y z] args]
-      (println "xyz:" x y z)
-      (THREE.BoxGeometry. x y z))
+    (let [[x y z] args] (THREE.BoxGeometry. x y z))
+    :sphere
+    (let [[radius w-segments h-segments] args]
+      (THREE.SphereGeometry. radius w-segments h-segments))
     (throw (str "Geometry not found:" kind))))
