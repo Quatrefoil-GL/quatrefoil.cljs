@@ -19,9 +19,12 @@
              (THREE.Group.)
              (let [geometry (render-geometry-dsl
                               (:name markup)
-                              (:args markup))
+                              (:args markup)
+                              (:attrs markup))
                    material (render-material-dsl (:material markup))
-                   mesh (THREE.Mesh. geometry material)]
+                   mesh (if (= :line (:name markup))
+                          (THREE.Line. geometry material)
+                          (THREE.Mesh. geometry material))]
                mesh))
         attrs (:attrs markup)]
     (doseq [child-entry (:children markup)]

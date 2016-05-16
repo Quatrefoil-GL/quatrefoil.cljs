@@ -1,6 +1,6 @@
 
 ns quatrefoil.component.container $ :require
-  [] quatrefoil.alias :refer $ [] scene light box group create-comp sphere
+  [] quatrefoil.alias :refer $ [] scene light box group create-comp sphere line
 
 defn render (store)
   fn
@@ -18,6 +18,16 @@ defn render (store)
           :args $ [] 2 20 20
           :attrs $ {}
             :position $ [] 0 0 0
+
+      group ({})
+        line $ {}
+          :material $ {} (:kind :line-basic)
+          :args $ []
+          :attrs $ {}
+            :vertices $ []
+              [] 0 0 0
+              [] 10 0 0
+              [] 0 10 0
 
       group
         {} $ :attrs

@@ -34,3 +34,6 @@ defn box (props & children)
 
 defn sphere (props & children)
   create-element :sphere props children
+
+defn line (props & children)
+  create-element :line props children

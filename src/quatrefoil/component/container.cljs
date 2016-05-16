@@ -2,7 +2,8 @@
 (ns quatrefoil.component.container
   (:require [quatrefoil.alias :refer [scene
                                       light
-                                      box group create-comp sphere]]))
+                                      box
+                                      group create-comp sphere line]]))
 
 (defn render [store]
   (fn [state mutate instant tick]
@@ -15,6 +16,12 @@
           {:args [2 20 20],
            :material {:wireframe true, :kind :mesh-basic},
            :attrs {:position [0 0 0]}}))
+      (group
+        {}
+        (line
+          {:args [],
+           :material {:kind :line-basic},
+           :attrs {:vertices [[0 0 0] [10 0 0] [0 10 0]]}}))
       (group
         {:attrs {:rotation [(* 0.1 js/Math.PI) 0 0]}}
         (box

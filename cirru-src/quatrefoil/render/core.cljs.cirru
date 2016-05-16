@@ -7,7 +7,7 @@ declare render-markup
 
 defn render-element (markup)
   let
-    (el $ case (:name markup) (:scene $ THREE.Scene.) (:light $ let ((([] color intensity distance) (:args markup)) (attrs $ :attrs markup) (light $ THREE.PointLight. color intensity distance)) (, light)) (:group $ THREE.Group.) (let ((geometry $ render-geometry-dsl (:name markup) (:args markup)) (material $ render-material-dsl (:material markup)) (mesh $ THREE.Mesh. geometry material)) (, mesh)))
+    (el $ case (:name markup) (:scene $ THREE.Scene.) (:light $ let ((([] color intensity distance) (:args markup)) (attrs $ :attrs markup) (light $ THREE.PointLight. color intensity distance)) (, light)) (:group $ THREE.Group.) (let ((geometry $ render-geometry-dsl (:name markup) (:args markup) (:attrs markup)) (material $ render-material-dsl (:material markup)) (mesh $ if (= :line $ :name markup) (THREE.Line. geometry material) (THREE.Mesh. geometry material))) (, mesh)))
       attrs $ :attrs markup
 
     doseq
