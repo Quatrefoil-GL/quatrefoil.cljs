@@ -1,8 +1,19 @@
 
 Quatrefoil
----
+----
 
-> 3D framework based on Three.js and Quamolit.
+> Render Three.js with Respo style code.
+
+### Develop
+
+```bash
+boot build-advanced
+webpack
+export boot_deps=`boot show -c`
+lumo -Kc $boot_deps:src/ -i render.cljs
+```
+
+Workflow https://github.com/mvc-works/stack-workflow
 
 ### License
 
