@@ -11,9 +11,14 @@
 
 (defn dispatch! [op op-data] )
 
+(defonce instants-ref (atom {}))
+
 (defonce store-ref (atom {}))
 
 (defonce states-ref (atom {}))
+
+(defn render-canvas-app! []
+  (render-canvas! (comp-canvas @store-ref) @states-ref @instants-ref))
 
 (defn render-app! []
   (let [target (.querySelector js/document "#app")]
@@ -23,8 +28,6 @@
   (let [ssr-element (.querySelector js/document "#ssr-stages")
         ssr-markup (.getAttribute ssr-element "content")]
     (read-string ssr-markup)))
-
-(defn render-canvas-app! [] (render-canvas! (comp-canvas @store-ref)))
 
 (defn -main! []
   (enable-console-print!)

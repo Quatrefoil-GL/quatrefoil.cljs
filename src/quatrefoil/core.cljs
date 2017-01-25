@@ -1,6 +1,9 @@
 
-(ns quatrefoil.core )
+(ns quatrefoil.core (:require [quatrefoil.dsl.render :refer [render-component]]))
 
-(defn render-canvas! [markup] (.log js/console "Markup:" markup))
+(defonce tree-ref (atom nil))
 
-(defonce markup-ref (atom nil))
+(defn render-canvas! [markup states instants]
+  (let [new-tree (render-component markup @tree-ref [] states instants)]
+    (reset! tree-ref new-tree)
+    (.log js/console "Tree:" new-tree)))

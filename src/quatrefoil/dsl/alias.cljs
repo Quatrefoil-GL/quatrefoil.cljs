@@ -23,8 +23,7 @@
    :remove? (fn [] false)})
 
 (defn create-comp [comp-name hooks render]
-  (fn [& args]
-    (Component. comp-name args nil {} {} render nil (merge basic-hooks hooks) false)))
+  (fn [& args] (Component. comp-name args {} {} render nil (merge basic-hooks hooks) false)))
 
 (defn line [props & children] (create-element :line props children))
 
