@@ -1,7 +1,8 @@
 
-(ns quatrefoil.dsl.object3d-dom (:require [cljsjs.three]))
+(ns quatrefoil.dsl.object3d-dom
+  (:require [cljsjs.three] [quatrefoil.util.core :refer [purify-tree]]))
 
-(defn create-element [] )
+(defn create-element [element] (js/THREE.Object3D.))
 
 (defonce virtual-tree-ref (atom {}))
 
@@ -19,6 +20,18 @@
 
 (defn set-param [] )
 
-(defn build-tree [coord tree] )
+(defn build-tree [coord tree]
+  (let [object3d (create-element (dissoc tree :children))
+        children (->> (:children tree)
+                      (map
+                       (fn [entry]
+                         (update entry 1 (fn [child] (build-tree (conj coord (first entry)))))))
+                      (into {}))
+        virtual-element {:object3d object3d, :children children}]
+    (.log js/console children)
+    (doseq [entry children]
+      (let [child (last entry)] (.log js/console "Child:" child entry) (.add object3d child)))
+    (swap! virtual-tree-ref assoc-in (conj coord 'data) virtual-element)
+    object3d))
 
 (defn set-material [] )

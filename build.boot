@@ -5,7 +5,7 @@
                   [org.clojure/clojurescript "1.9.293"     :scope "test"]
                   [adzerk/boot-cljs          "1.7.228-1"   :scope "test"]
                   [adzerk/boot-reload        "0.4.13"      :scope "test"]
-                  [cirru/boot-stack-server   "0.1.27"      :scope "test"]
+                  [cirru/boot-stack-server   "0.1.28"      :scope "test"]
                   [adzerk/boot-test          "1.1.2"       :scope "test"]
                   [binaryage/devtools        "0.9.0"       :scope "test"]
                   [mvc-works/hsl             "0.1.2"]
