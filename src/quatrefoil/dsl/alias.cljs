@@ -7,11 +7,7 @@
    props
    (if (seq? children) (->> children (map-indexed vector) (into {})) children)))
 
-(defn sphere [props & children] (create-element :sphere props children))
-
-(defn group [props & children] (create-element :group props children))
-
-(defn cube [props & children] (create-element :cube props children))
+(defn light [props & children] (create-element :light props children))
 
 (def basic-hooks
   {:init-state (fn [& args] {}),
@@ -22,9 +18,15 @@
    :on-unmount (fn [] ),
    :remove? (fn [] false)})
 
+(defn cuboid [props & children] (create-element :cuboid props children))
+
+(defn group [props & children] (create-element :group props children))
+
 (defn create-comp [comp-name hooks render]
   (fn [& args] (Component. comp-name args {} {} render nil (merge basic-hooks hooks) false)))
 
+(defn cube [props & children] (create-element :cube props children))
+
 (defn line [props & children] (create-element :line props children))
 
-(defn scene [props & children] (create-element :scene props children))
+(defn sphere [props & children] (create-element :sphere props children))

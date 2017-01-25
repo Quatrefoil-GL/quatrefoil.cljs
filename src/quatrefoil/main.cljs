@@ -7,18 +7,25 @@
             [cljs.reader :refer [read-string]]
             [quatrefoil.core :refer [render-canvas!]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
-            [devtools.core :as devtools]))
+            [devtools.core :as devtools]
+            [cljsjs.three]
+            [quatrefoil.dsl.object3d-dom :refer [camera-ref]]))
 
 (defn dispatch! [op op-data] )
 
 (defonce instants-ref (atom {}))
 
+(defonce renderer-ref (atom nil))
+
 (defonce store-ref (atom {}))
 
 (defonce states-ref (atom {}))
 
+(defonce scene (js/THREE.Scene.))
+
 (defn render-canvas-app! []
-  (render-canvas! (comp-canvas @store-ref) @states-ref @instants-ref))
+  (render-canvas! (comp-canvas @store-ref) @states-ref @instants-ref scene)
+  (.render @renderer-ref scene @camera-ref))
 
 (defn render-app! []
   (let [target (.querySelector js/document "#app")]
@@ -39,6 +46,11 @@
        (render-element (comp-container @store-ref ssr-stages) states-ref)
        dispatch!)))
   (render-app!)
+  (reset!
+   renderer-ref
+   (js/THREE.WebGLRenderer.
+    (clj->js {:canvas (js/document.querySelector "canvas"), :antialias true})))
+  (.setSize @renderer-ref js/window.innerWidth js/window.innerHeight)
   (render-canvas-app!)
   (add-watch store-ref :changes render-canvas-app!)
   (add-watch states-ref :changes render-canvas-app!)

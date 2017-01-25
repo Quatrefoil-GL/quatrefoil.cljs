@@ -31,7 +31,8 @@
   (let [file-dict (collect-files sepal-data)]
     (doseq [entry file-dict]
       (let [[file-name content] entry]
-        (fs.writeFileSync (path.join out-folder (str file-name extname)) content)))))
+        (fs.writeFileSync (path.join out-folder (str file-name extname)) content)
+        (println "Write file:" file-name)))))
 
 (defn req-handler [req res]
   (.setHeader res "Access-Control-Allow-Origin" req.headers.origin)
