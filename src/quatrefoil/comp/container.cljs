@@ -11,7 +11,6 @@
    :container
    (fn [store]
      (fn [state mutate!]
-       (println js/window.innerWidth)
        (div
         {:style (merge ui/global)}
         (canvas

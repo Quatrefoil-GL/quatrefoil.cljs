@@ -4,7 +4,10 @@
              :refer
              [render! clear-cache! falsify-stage! render-element gc-states!]]
             [quatrefoil.comp.container :refer [comp-container]]
-            [cljs.reader :refer [read-string]]))
+            [cljs.reader :refer [read-string]]
+            [quatrefoil.core :refer [render-canvas!]]
+            [quatrefoil.comp.canvas :refer [comp-canvas]]
+            [devtools.core :as devtools]))
 
 (defn dispatch! [op op-data] )
 
@@ -21,8 +24,11 @@
         ssr-markup (.getAttribute ssr-element "content")]
     (read-string ssr-markup)))
 
+(defn render-canvas-app! [] (render-canvas! (comp-canvas @store-ref)))
+
 (defn -main! []
   (enable-console-print!)
+  (devtools/install!)
   (if (not (empty? ssr-stages))
     (let [target (.querySelector js/document "#app")]
       (falsify-stage!
@@ -30,11 +36,11 @@
        (render-element (comp-container @store-ref ssr-stages) states-ref)
        dispatch!)))
   (render-app!)
-  (add-watch store-ref :gc (fn [] (gc-states! states-ref)))
-  (add-watch store-ref :changes render-app!)
-  (add-watch states-ref :changes render-app!)
+  (render-canvas-app!)
+  (add-watch store-ref :changes render-canvas-app!)
+  (add-watch states-ref :changes render-canvas-app!)
   (println "App started!"))
 
-(defn on-jsload! [] (clear-cache!) (render-app!) (println "Code updated."))
+(defn on-jsload! [] (render-canvas-app!) (println "Code updated."))
 
 (set! (.-onload js/window) -main!)

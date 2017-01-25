@@ -7,6 +7,7 @@
                   [adzerk/boot-reload        "0.4.13"      :scope "test"]
                   [cirru/boot-stack-server   "0.1.27"      :scope "test"]
                   [adzerk/boot-test          "1.1.2"       :scope "test"]
+                  [binaryage/devtools   "0.9.0"       :scope "test"]
                   [mvc-works/hsl             "0.1.2"]
                   [respo/ui                  "0.1.6"]
                   [respo                     "0.3.37"]])
