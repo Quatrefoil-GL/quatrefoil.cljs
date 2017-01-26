@@ -3,4 +3,4 @@
 
 (defrecord Component [name args states instants render tree hooks removing?])
 
-(defrecord Shape [name props children])
+(defrecord Shape [name params material event children])
