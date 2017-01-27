@@ -9,7 +9,7 @@
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
             [cljsjs.three]
-            [quatrefoil.dsl.object3d-dom :refer [camera-ref]]))
+            [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene]]))
 
 (defn dispatch! [op op-data] )
 
@@ -21,11 +21,9 @@
 
 (defonce states-ref (atom {}))
 
-(defonce scene (js/THREE.Scene.))
-
 (defn render-canvas-app! []
-  (render-canvas! (comp-canvas @store-ref) @states-ref @instants-ref scene)
-  (.render @renderer-ref scene @camera-ref))
+  (render-canvas! (comp-canvas @store-ref) @states-ref @instants-ref global-scene)
+  (.render @renderer-ref global-scene @camera-ref))
 
 (defn render-app! []
   (let [target (.querySelector js/document "#app")]

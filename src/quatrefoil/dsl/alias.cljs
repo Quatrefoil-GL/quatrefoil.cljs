@@ -9,9 +9,7 @@
    (:event props)
    (if (seq? children) (->> children (map-indexed vector) (into {})) children)))
 
-(defn sphere [props & children] (create-element :sphere props children))
-
-(defn group [props & children] (create-element :group props children))
+(defn point-light [props & children] (create-element :point-light props children))
 
 (def basic-hooks
   {:init-state (fn [& args] {}),
@@ -22,6 +20,13 @@
    :on-unmount (fn [] ),
    :remove? (fn [] false)})
 
+(defn perspective-camera [props & children]
+  (create-element :perspective-camera props children))
+
+(defn group [props & children] (create-element :group props children))
+
+(defn camera [props & children] (create-element :camera props children))
+
 (defn create-comp [comp-name hooks render]
   (fn [& args] (Component. comp-name args {} {} render nil (merge basic-hooks hooks) false)))
 
@@ -29,4 +34,6 @@
 
 (defn line [props & children] (create-element :line props children))
 
-(defn light [props & children] (create-element :light props children))
+(defn sphere [props & children] (create-element :sphere props children))
+
+(defn scene [props & children] (create-element :scene props children))
