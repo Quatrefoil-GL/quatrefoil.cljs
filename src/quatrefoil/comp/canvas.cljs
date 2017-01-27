@@ -14,7 +14,8 @@
         {}
         (box
          {:params {:width 16, :height 2, :depth 6},
-          :material {:kind :mesh-basic, :color 0x808080, :opacity 0.6}}))))))
+          :material {:kind :mesh-basic, :color 0x808080, :opacity 0.6},
+          :event {:click (fn [event] (.log js/console "Click:" event))}}))))))
 
 (def comp-canvas
   (create-comp
@@ -27,7 +28,8 @@
         (comp-demo)
         (sphere
          {:params {:radius 4, :x 40},
-          :material {:kind :mesh-basic, :opacity 0.6, :color 0x9050c0}})
+          :material {:kind :mesh-basic, :opacity 0.6, :color 0x9050c0},
+          :event {:click (fn [event] (.log js/console "Click:" event))}})
         (point-light
          {:params {:color 0xffaaaa, :x 60, :y 20, :z 0, :intensity 1, :distance 100}})
         (perspective-camera

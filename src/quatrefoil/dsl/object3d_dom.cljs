@@ -1,6 +1,6 @@
 
 (ns quatrefoil.dsl.object3d-dom
-  (:require [cljsjs.three] [quatrefoil.util.core :refer [purify-tree]]))
+  (:require [cljsjs.three] [quatrefoil.util.core :refer [purify-tree collect-children]]))
 
 (defonce camera-ref (atom nil))
 
@@ -29,6 +29,7 @@
                   (or (:height-segments params) 32))
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
+    (set! object3d.event event)
     (.log js/console "Sphere:" object3d)
     object3d))
 
@@ -36,9 +37,10 @@
   (let [geometry (js/THREE.BoxGeometry. (:width params) (:height params) (:depth params))
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
+    (set! object3d.event event)
     object3d))
 
-(def global-scene (js/THREE.Scene.))
+(defonce global-scene (js/THREE.Scene.))
 
 (defn create-point-light [params]
   (let [color (:color params)
@@ -73,6 +75,25 @@
 
 (defn set-param [] )
 
+(defn on-canvas-click [event]
+  (let [mouse (js/THREE.Vector2.), raycaster (js/THREE.Raycaster.)]
+    (set! mouse.x (dec (* 2 (/ event.clientX js/window.innerWidth))))
+    (set! mouse.y (- 1 (* 2 (/ event.clientY js/window.innerHeight))))
+    (.log js/console mouse)
+    (.setFromCamera raycaster mouse @camera-ref)
+    (let [intersects (.intersectObjects
+                      raycaster
+                      (let [children (clj->js []), collect! (fn [x] (.push children x))]
+                        (collect-children global-scene collect!)
+                        (.log js/console "Children:" children)
+                        children))
+          maybe-target (aget intersects 0)]
+      (.log js/console intersects)
+      (if (some? maybe-target)
+        (let [click-handler (:click maybe-target.object.event)]
+          (.log js/console click-handler)
+          (click-handler event))))))
+
 (defn build-tree [coord tree]
   (let [object3d (create-element (dissoc tree :children))
         children (->> (:children tree)
@@ -85,7 +106,9 @@
                       (into {}))
         virtual-element {:object3d object3d, :children children}]
     (doseq [entry children]
-      (let [child (last entry)] (.log js/console "Child:" child entry) (.add object3d child)))
+      (let [child (last entry)]
+        (comment .log js/console "Child:" child entry)
+        (.add object3d child)))
     (swap! virtual-tree-ref assoc-in (conj coord 'data) virtual-element)
     object3d))
 

@@ -22,3 +22,11 @@
         (if (identical? (first xs) (first ys)) (recur (rest xs) (rest ys)) false)))))
 
 (defn shape? [x] (= Shape (type x)))
+
+(defn collect-children [element collect!]
+  (.forEach
+   element.children
+   (fn [child]
+     (.log js/console "Child:" child)
+     (collect! child)
+     (if (some? child.children) (collect-children child collect!)))))

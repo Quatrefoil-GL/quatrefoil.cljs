@@ -9,7 +9,7 @@
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
             [cljsjs.three]
-            [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene]]))
+            [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]))
 
 (defn dispatch! [op op-data] )
 
@@ -44,10 +44,11 @@
        (render-element (comp-container @store-ref ssr-stages) states-ref)
        dispatch!)))
   (render-app!)
-  (reset!
-   renderer-ref
-   (js/THREE.WebGLRenderer.
-    (clj->js {:canvas (js/document.querySelector "canvas"), :antialias true})))
+  (let [canvas-el (js/document.querySelector "canvas")]
+    (reset!
+     renderer-ref
+     (js/THREE.WebGLRenderer. (clj->js {:canvas canvas-el, :antialias true})))
+    (.addEventListener canvas-el "click" (fn [event] (on-canvas-click event))))
   (.setSize @renderer-ref js/window.innerWidth js/window.innerHeight)
   (render-canvas-app!)
   (add-watch store-ref :changes render-canvas-app!)
