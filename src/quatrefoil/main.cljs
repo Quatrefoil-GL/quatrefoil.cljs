@@ -5,13 +5,13 @@
              [render! clear-cache! falsify-stage! render-element gc-states!]]
             [quatrefoil.comp.container :refer [comp-container]]
             [cljs.reader :refer [read-string]]
-            [quatrefoil.core :refer [render-canvas!]]
+            [quatrefoil.core :refer [render-canvas! tree-ref]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
             [cljsjs.three]
             [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]))
 
-(defn dispatch! [op op-data] )
+(defn dispatch! [op op-data] (println "Dispatch:" op op-data))
 
 (defonce instants-ref (atom {}))
 
@@ -22,7 +22,8 @@
 (defonce states-ref (atom {}))
 
 (defn render-canvas-app! []
-  (render-canvas! (comp-canvas @store-ref) @states-ref @instants-ref global-scene)
+  (.log js/console "Rerender" @store-ref @states-ref)
+  (render-canvas! (comp-canvas @store-ref) states-ref @instants-ref global-scene)
   (.render @renderer-ref global-scene @camera-ref))
 
 (defn render-app! []
@@ -48,7 +49,10 @@
     (reset!
      renderer-ref
      (js/THREE.WebGLRenderer. (clj->js {:canvas canvas-el, :antialias true})))
-    (.addEventListener canvas-el "click" (fn [event] (on-canvas-click event))))
+    (.addEventListener
+     canvas-el
+     "click"
+     (fn [event] (on-canvas-click event dispatch! tree-ref))))
   (.setSize @renderer-ref js/window.innerWidth js/window.innerHeight)
   (render-canvas-app!)
   (add-watch store-ref :changes render-canvas-app!)

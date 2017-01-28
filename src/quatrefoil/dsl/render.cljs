@@ -7,35 +7,45 @@
 
 (declare render-markup)
 
-(defn render-markup [markup prev-markup coord comp-coord states instants]
+(defn render-markup [markup prev-markup coord comp-coord states build-mutate instants]
   (if (comp? markup)
-    (render-component markup prev-markup coord states instants)
-    (render-shape markup prev-markup coord coord states instants)))
-
-(defn render-shape [markup prev-markup coord comp-coord states instants]
-  (let [prev-children (:children prev-markup)]
-    (update
+    (render-component
      markup
-     :children
-     (fn [children]
-       (->> children
-            (map
-             (fn [entry]
-               (update
-                entry
-                1
-                (fn [child]
-                  (let [k (first entry)]
-                    (render-markup
-                     child
-                     (get prev-children k)
-                     (conj coord k)
-                     comp-coord
-                     (get states k)
-                     (get instants k)))))))
-            (into {}))))))
+     prev-markup
+     coord
+     (get states (:name markup))
+     build-mutate
+     instants)
+    (render-shape markup prev-markup coord comp-coord states build-mutate instants)))
 
-(defn render-component [markup prev-tree coord states instants]
+(defn render-shape [markup prev-markup coord comp-coord states build-mutate instants]
+  (let [prev-children (:children prev-markup)]
+    (comment .log js/console "Shape:" markup)
+    (-> markup
+        (assoc :coord coord)
+        (update
+         :children
+         (fn [children]
+           (->> children
+                (map
+                 (fn [entry]
+                   (update
+                    entry
+                    1
+                    (fn [child]
+                      (let [k (first entry)]
+                        (render-markup
+                         child
+                         (get prev-children k)
+                         (conj coord k)
+                         comp-coord
+                         (get states k)
+                         build-mutate
+                         (get instants k)))))))
+                (into {})))))))
+
+(defn render-component [markup prev-tree coord states build-mutate instants]
+  (.log js/console "Component states:" states)
   (if (and (some? prev-tree)
            (let [prev-args (:args prev-tree)
                  prev-states (:states prev-tree)
@@ -45,14 +55,25 @@
                   (identical? instants prev-instants))))
     prev-tree
     (let [comp-name (:name markup)
-          mutate! (fn [& args] (println "Mutate:" args))
+          base-coord (conj coord comp-name)
+          hooks (:hooks markup)
+          state (if (contains? states 'data)
+                  (get states 'data)
+                  (let [init-state (:init-state hooks)] (apply init-state (:args markup))))
+          update-state (:update-state hooks)
+          mutate! (fn [& args]
+                    (let [new-state (apply update-state (cons state args))]
+                      (.log js/console "During mutate:" base-coord state new-state states)
+                      (build-mutate base-coord new-state)))
+          instant (get instants comp-name)
           tree (-> (:render markup)
                    (apply (:args markup))
-                   (apply (list (get states 'data) mutate! (get instants 'data)))
+                   (apply (list state mutate! (get instants 'data)))
                    (render-markup
                     (:tree prev-tree)
-                    (conj coord comp-name)
-                    coord
-                    (get states comp-name)
-                    (get instants comp-name)))]
+                    base-coord
+                    base-coord
+                    states
+                    build-mutate
+                    instant))]
       (merge markup {:tree tree, :states states, :instants instants}))))

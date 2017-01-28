@@ -7,7 +7,8 @@
    (:params props)
    (:material props)
    (:event props)
-   (if (seq? children) (->> children (map-indexed vector) (into {})) children)))
+   (if (seq? children) (->> children (map-indexed vector) (into {})) children)
+   nil))
 
 (defn point-light [props & children] (create-element :point-light props children))
 

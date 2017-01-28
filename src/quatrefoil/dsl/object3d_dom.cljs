@@ -1,6 +1,7 @@
 
 (ns quatrefoil.dsl.object3d-dom
-  (:require [cljsjs.three] [quatrefoil.util.core :refer [purify-tree collect-children]]))
+  (:require [cljsjs.three]
+            [quatrefoil.util.core :refer [purify-tree collect-children find-element]]))
 
 (defonce camera-ref (atom nil))
 
@@ -22,22 +23,22 @@
      (.warn js/console "Unknown material:" material)
      (js/THREE.LineBasicMaterial. (clj->js (dissoc material :kind))))))
 
-(defn create-sphere-element [params material event]
+(defn create-sphere-element [params material event comp-coord]
   (let [geometry (js/THREE.SphereGeometry.
                   (or (:radius params) 8)
                   (or (:width-segments params) 32)
                   (or (:height-segments params) 32))
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
-    (set! object3d.event event)
+    (set! object3d.coord comp-coord)
     (.log js/console "Sphere:" object3d)
     object3d))
 
-(defn create-box-element [params material event]
+(defn create-box-element [params material event comp-coord]
   (let [geometry (js/THREE.BoxGeometry. (:width params) (:height params) (:depth params))
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
-    (set! object3d.event event)
+    (set! object3d.coord comp-coord)
     object3d))
 
 (defonce global-scene (js/THREE.Scene.))
@@ -52,15 +53,16 @@
     object3d))
 
 (defn create-element [element]
-  (.log js/console "Element:" element)
+  (.log js/console "Element:" element (:coord element))
   (let [params (or (:params element) {})
         material (or (:material element) {:kind :mesh-basic, :color 0xa0a0a0})
-        event (:event element)]
+        event (:event element)
+        coord (:coord element)]
     (case (:name element)
       :scene global-scene
       :group (js/THREE.Group.)
-      :box (create-box-element params material event)
-      :sphere (create-sphere-element params material event)
+      :box (create-box-element params material event coord)
+      :sphere (create-sphere-element params material event coord)
       :point-light (create-point-light params)
       :perspective-camera (create-perspective-camera params)
       (do (.warn js/console "Unknown element" element) (js/THREE.Object3D.)))))
@@ -75,24 +77,25 @@
 
 (defn set-param [] )
 
-(defn on-canvas-click [event]
+(defn on-canvas-click [event dispatch! tree-ref]
   (let [mouse (js/THREE.Vector2.), raycaster (js/THREE.Raycaster.)]
     (set! mouse.x (dec (* 2 (/ event.clientX js/window.innerWidth))))
     (set! mouse.y (- 1 (* 2 (/ event.clientY js/window.innerHeight))))
-    (.log js/console mouse)
     (.setFromCamera raycaster mouse @camera-ref)
     (let [intersects (.intersectObjects
                       raycaster
                       (let [children (clj->js []), collect! (fn [x] (.push children x))]
                         (collect-children global-scene collect!)
-                        (.log js/console "Children:" children)
                         children))
           maybe-target (aget intersects 0)]
       (.log js/console intersects)
       (if (some? maybe-target)
-        (let [click-handler (:click maybe-target.object.event)]
-          (.log js/console click-handler)
-          (click-handler event))))))
+        (let [coord maybe-target.object.coord
+              target-el (find-element @tree-ref coord)
+              maybe-handler (:click (:event target-el))]
+          (if (some? maybe-handler)
+            (maybe-handler event dispatch!)
+            (println "Found no handler for" coord)))))))
 
 (defn build-tree [coord tree]
   (let [object3d (create-element (dissoc tree :children))
