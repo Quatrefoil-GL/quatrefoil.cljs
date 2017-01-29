@@ -10,8 +10,7 @@
                   [binaryage/devtools        "0.9.0"       :scope "test"]
                   [mvc-works/hsl             "0.1.2"]
                   [respo/ui                  "0.1.6"]
-                  [respo                     "0.3.37"]
-                  [cljsjs/three              "0.0.76-0"]])
+                  [respo                     "0.3.37"]])
 
 (require '[adzerk.boot-cljs   :refer [cljs]]
          '[adzerk.boot-reload :refer [reload]]

@@ -2,7 +2,7 @@
 (ns quatrefoil.comp.canvas
   (:require [quatrefoil.dsl.alias
              :refer
-             [create-comp group box sphere point-light perspective-camera scene]]))
+             [create-comp group box sphere point-light perspective-camera scene text]]))
 
 (def comp-demo
   (create-comp
@@ -14,12 +14,16 @@
         {}
         (box
          {:params {:width 16, :height 4, :depth 6},
-          :material {:kind :mesh-basic, :color 0x808080, :opacity 0.6},
+          :material {:kind :mesh-lambert, :color 0x808080, :opacity 0.6},
           :event {:click (fn [event dispatch!]
                     (.log js/console "Click:" event)
                     (dispatch! :demo nil)
                     (mutate! "Mutate demo"))}})
-        (group {}))))))
+        (group
+         {}
+         (text
+          {:params {:text "Quatrefoil", :size 8, :height 4},
+           :material {:kind :mesh-lambert, :color 0xffcccc}})))))))
 
 (def comp-canvas
   (create-comp
@@ -32,15 +36,15 @@
         (comp-demo)
         (sphere
          {:params {:radius 4, :x 40},
-          :material {:kind :mesh-basic, :opacity 0.6, :color 0x9050c0},
+          :material {:kind :mesh-lambert, :opacity 0.6, :color 0x9050c0},
           :event {:click (fn [event dispatch!]
                     (.log js/console "Click:" event)
                     (dispatch! :canvas nil))}})
         (point-light
-         {:params {:color 0xffaaaa, :x 60, :y 20, :z 0, :intensity 1, :distance 400}})
+         {:params {:color 0xffaaaa, :x 0, :y 40, :z 40, :intensity 2, :distance 400}})
         (perspective-camera
          {:params {:x 10,
-                   :y -10,
+                   :y 20,
                    :z 100,
                    :fov 45,
                    :aspect (/ js/window.innerWidth js/window.innerHeight),

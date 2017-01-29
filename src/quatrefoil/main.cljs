@@ -8,7 +8,6 @@
             [quatrefoil.core :refer [render-canvas! tree-ref]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
-            [cljsjs.three]
             [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]))
 
 (defn dispatch! [op op-data] (println "Dispatch:" op op-data))

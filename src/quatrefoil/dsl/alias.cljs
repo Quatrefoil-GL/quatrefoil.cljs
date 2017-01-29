@@ -33,6 +33,8 @@
 
 (defn box [props & children] (create-element :box props children))
 
+(defn text [props & children] (create-element :text props children))
+
 (defn line [props & children] (create-element :line props children))
 
 (defn sphere [props & children] (create-element :sphere props children))

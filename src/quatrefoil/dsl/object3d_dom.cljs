@@ -1,7 +1,6 @@
 
 (ns quatrefoil.dsl.object3d-dom
-  (:require [cljsjs.three]
-            [quatrefoil.util.core :refer [purify-tree collect-children find-element]]))
+  (:require [quatrefoil.util.core :refer [purify-tree collect-children find-element]]))
 
 (defonce camera-ref (atom nil))
 
@@ -19,6 +18,7 @@
   (case (:kind material)
     :line-basic (js/THREE.LineBasicMaterial. (clj->js (dissoc material :kind)))
     :mesh-basic (js/THREE.MeshBasicMaterial. (clj->js (dissoc material :kind)))
+    :mesh-lambert (js/THREE.MeshLambertMaterial. (clj->js (dissoc material :kind)))
     (do
      (.warn js/console "Unknown material:" material)
      (js/THREE.LineBasicMaterial. (clj->js (dissoc material :kind))))))
@@ -29,7 +29,7 @@
                   (or (:width-segments params) 32)
                   (or (:height-segments params) 32))
         object3d (js/THREE.Mesh. geometry (create-material material))]
-    (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
+    (.set object3d.position (:x params) (:y params) (:z params))
     (set! object3d.coord comp-coord)
     (.log js/console "Sphere:" object3d)
     object3d))
@@ -39,6 +39,23 @@
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
     (set! object3d.coord comp-coord)
+    object3d))
+
+(defonce font-ref
+  (do
+   (let [loader (THREE.FontLoader.)]
+     (.load
+      loader
+      "hind.json"
+      (fn [response] (.log js/console response) (reset! font-ref response))))
+   (atom (js/THREE.Font. nil))))
+
+(defn create-text-element [params material]
+  (let [geometry (js/THREE.TextGeometry.
+                  (or (:text params) "Quatrefoil")
+                  (clj->js (assoc params :font @font-ref)))
+        object3d (js/THREE.Mesh. geometry (create-material material))]
+    (.set object3d.position (:x params) (:y params) (:z params))
     object3d))
 
 (defonce global-scene (js/THREE.Scene.))
@@ -53,7 +70,7 @@
     object3d))
 
 (defn create-element [element]
-  (.log js/console "Element:" element (:coord element))
+  (comment .log js/console "Element:" element (:coord element))
   (let [params (or (:params element) {})
         material (or (:material element) {:kind :mesh-basic, :color 0xa0a0a0})
         event (:event element)
@@ -65,6 +82,7 @@
       :sphere (create-sphere-element params material event coord)
       :point-light (create-point-light params)
       :perspective-camera (create-perspective-camera params)
+      :text (create-text-element params material)
       (do (.warn js/console "Unknown element" element) (js/THREE.Object3D.)))))
 
 (defonce virtual-tree-ref (atom {}))
