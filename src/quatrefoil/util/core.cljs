@@ -22,7 +22,7 @@
         (if (identical? (first xs) (first ys)) (recur (rest xs) (rest ys)) false)))))
 
 (defn find-element [tree comp-coord]
-  (.log js/console "Find..." tree comp-coord)
+  (comment .log js/console "Find..." tree comp-coord)
   (if (empty? comp-coord)
     tree
     (let [cursor (first comp-coord)]

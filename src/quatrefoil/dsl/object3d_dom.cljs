@@ -129,7 +129,7 @@
     (doseq [entry children]
       (let [child (last entry)]
         (comment .log js/console "Child:" child entry)
-        (.add object3d child)))
+        (.addBy object3d (first entry) child)))
     (swap! virtual-tree-ref assoc-in (conj coord 'data) virtual-element)
     object3d))
 

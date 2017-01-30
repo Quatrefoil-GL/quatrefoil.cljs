@@ -8,15 +8,18 @@
             [quatrefoil.core :refer [render-canvas! tree-ref]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
-            [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]))
+            [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]
+            [quatrefoil.updater.core :refer [updater]]))
 
-(defn dispatch! [op op-data] (println "Dispatch:" op op-data))
+(defonce store-ref (atom {}))
+
+(defn dispatch! [op op-data]
+  (.log js/console "Dispatch:" op op-data)
+  (let [store (updater @store-ref op op-data)] (reset! store-ref store)))
 
 (defonce instants-ref (atom {}))
 
 (defonce renderer-ref (atom nil))
-
-(defonce store-ref (atom {}))
 
 (defonce states-ref (atom {}))
 

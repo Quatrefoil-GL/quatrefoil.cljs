@@ -21,7 +21,7 @@
     (if (some? @tree-ref)
       (let [changes-ref (atom []), collect! (fn [x] (swap! changes-ref conj x))]
         (diff-tree @tree-ref new-tree [] collect!)
-        (.log js/console @changes-ref))
+        (.log js/console "Changes:" @changes-ref))
       (build-tree [] (purify-tree new-tree)))
     (reset! tree-ref new-tree)
     (.log js/console "Tree:" new-tree)))

@@ -22,6 +22,7 @@
       (body {}
         (div {:attrs {:id "app"}})
         (script {:attrs {:src "https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js"}})
+        (script {:attrs {:src "object3d.js"}})
         (script {:attrs {:src "main.js"}})))))
 
 (defn generate-html [ssr-stages]
