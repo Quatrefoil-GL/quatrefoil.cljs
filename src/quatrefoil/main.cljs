@@ -11,11 +11,12 @@
             [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]
             [quatrefoil.updater.core :refer [updater]]))
 
-(defonce store-ref (atom {}))
+(defonce store-ref (atom {:tasks {100 {:id 100, :text "Initial task", :done? false}}}))
 
 (defn dispatch! [op op-data]
-  (.log js/console "Dispatch:" op op-data)
-  (let [store (updater @store-ref op op-data)] (reset! store-ref store)))
+  (let [store (updater @store-ref op op-data)]
+    (.log js/console "Dispatch:" op op-data store)
+    (reset! store-ref store)))
 
 (defonce instants-ref (atom {}))
 

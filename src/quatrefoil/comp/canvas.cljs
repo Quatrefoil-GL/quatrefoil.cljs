@@ -2,7 +2,8 @@
 (ns quatrefoil.comp.canvas
   (:require [quatrefoil.dsl.alias
              :refer
-             [create-comp group box sphere point-light perspective-camera scene text]]))
+             [create-comp group box sphere point-light perspective-camera scene text]]
+            [quatrefoil.comp.todolist :refer [comp-todolist]]))
 
 (def comp-demo
   (create-comp
@@ -19,6 +20,12 @@
                     (.log js/console "Click:" event)
                     (dispatch! :demo nil)
                     (mutate! "Mutate demo"))}})
+        (sphere
+         {:params {:radius 4, :x 40},
+          :material {:kind :mesh-lambert, :opacity 0.6, :color 0x9050c0},
+          :event {:click (fn [event dispatch!]
+                    (.log js/console "Click:" event)
+                    (dispatch! :canvas nil))}})
         (group
          {}
          (text
@@ -34,12 +41,7 @@
        (scene
         {}
         (comp-demo)
-        (sphere
-         {:params {:radius 4, :x 40},
-          :material {:kind :mesh-lambert, :opacity 0.6, :color 0x9050c0},
-          :event {:click (fn [event dispatch!]
-                    (.log js/console "Click:" event)
-                    (dispatch! :canvas nil))}})
+        (comp-todolist (:tasks store))
         (point-light
          {:params {:color 0xffaaaa, :x 0, :y 40, :z 60, :intensity 2, :distance 400}})
         (perspective-camera

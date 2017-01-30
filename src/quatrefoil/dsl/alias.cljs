@@ -1,5 +1,15 @@
 
-(ns quatrefoil.dsl.alias (:require [quatrefoil.types :refer [Shape Component]]))
+(ns quatrefoil.dsl.alias
+  (:require [quatrefoil.types :refer [Shape Component]]
+            [quatrefoil.util.core :refer [comp? shape?]]))
+
+(defn arrange-children [children]
+  (let [cursor (first children)
+        result (if (and (= 1 (count children)) (not (or (comp? cursor) (shape? cursor))))
+                 (->> cursor (filter (fn [entry] (some? (last entry)))) (into {}))
+                 (->> children (filter some?) (map-indexed vector) (into {})))]
+    (comment .log js/console "Handle children:" children result)
+    result))
 
 (defn create-element [el-name props children]
   (Shape.
@@ -7,7 +17,7 @@
    (:params props)
    (:material props)
    (:event props)
-   (if (seq? children) (->> children (map-indexed vector) (into {})) children)
+   (arrange-children children)
    nil))
 
 (defn point-light [props & children] (create-element :point-light props children))

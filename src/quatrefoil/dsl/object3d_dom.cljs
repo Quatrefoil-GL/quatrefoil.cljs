@@ -69,6 +69,11 @@
     (.log js/console "Light:" object3d)
     object3d))
 
+(defn create-group-element [params]
+  (let [object3d (js/THREE.Group.)]
+    (.set object3d.position (:x params) (:y params) (:z params))
+    object3d))
+
 (defn create-element [element]
   (comment .log js/console "Element:" element (:coord element))
   (let [params (or (:params element) {})
@@ -77,7 +82,7 @@
         coord (:coord element)]
     (case (:name element)
       :scene global-scene
-      :group (js/THREE.Group.)
+      :group (create-group-element params)
       :box (create-box-element params material event coord)
       :sphere (create-sphere-element params material event coord)
       :point-light (create-point-light params)
