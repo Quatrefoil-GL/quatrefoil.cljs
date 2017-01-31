@@ -50,10 +50,15 @@
            (let [prev-args (:args prev-tree)
                  prev-states (:states prev-tree)
                  prev-instants (:instants prev-tree)]
+             (comment
+              println
+              (=seq? (:args markup) prev-args)
+              (identical? states prev-states)
+              (identical? instants prev-instants))
              (and (=seq? (:args markup) prev-args)
                   (identical? states prev-states)
                   (identical? instants prev-instants))))
-    prev-tree
+    (do (.log js/console "Reusing component:" coord) prev-tree)
     (let [comp-name (:name markup)
           base-coord (conj coord comp-name)
           hooks (:hooks markup)
@@ -76,4 +81,5 @@
                     states
                     build-mutate
                     instant))]
+      (.log js/console "Creating new component:" coord)
       (merge markup {:tree tree, :states states, :instants instants}))))

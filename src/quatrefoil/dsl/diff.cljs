@@ -1,5 +1,6 @@
 
-(ns quatrefoil.dsl.diff (:require [clojure.set :as set]))
+(ns quatrefoil.dsl.diff
+  (:require [clojure.set :as set] [quatrefoil.util.core :refer [comp? shape?]]))
 
 (declare diff-children)
 
@@ -29,8 +30,8 @@
     (if (not (empty? removed-events)) (collect! [coord :remove-events removed-events]))))
 
 (defn diff-material [prev-material material coord collect!]
-  (let [prev-keys (keys prev-material)
-        curr-keys (keys material)
+  (let [prev-keys (into #{} (keys prev-material))
+        curr-keys (into #{} (keys material))
         added-material (->> (set/difference curr-keys prev-keys)
                             (map (fn [k] [k (get material k)])))
         removed-keys (->> (set/difference prev-keys curr-keys) (into #{}))
@@ -45,24 +46,32 @@
       (collect! [coord :update-material updated-material]))))
 
 (defn diff-tree [prev-tree tree coord collect!]
-  (if (some? prev-tree)
-    (if (some? tree)
-      (do
-       (diff-params (:params prev-tree) (:params tree) coord collect!)
-       (diff-material (:material prev-tree) (:material tree) coord collect!)
-       (diff-events (:event prev-tree) (:event tree) coord collect!)
-       (diff-children (:children prev-tree) (:children tree) coord collect!))
-      (collect! [coord :remove]))
-    (if (some? tree) (collect! [coord :create tree]) nil)))
+  (.log js/console "Diffing:" coord (some? prev-tree) (some? tree))
+  (cond
+    (comp? prev-tree) (recur (:tree prev-tree) tree coord collect!)
+    (comp? tree) (recur prev-tree (:tree tree) coord collect!)
+    :else
+      (if (some? prev-tree)
+        (if (some? tree)
+          (do
+           (diff-params (:params prev-tree) (:params tree) coord collect!)
+           (diff-material (:material prev-tree) (:material tree) coord collect!)
+           (diff-events (:event prev-tree) (:event tree) coord collect!)
+           (diff-children (:children prev-tree) (:children tree) coord collect!))
+          (collect! [coord :remove]))
+        (if (some? tree) (collect! [coord :create tree]) nil))))
 
 (defn diff-children [prev-children children coord collect!]
-  (let [prev-keys (keys prev-children)
-        curr-keys (keys children)
+  (let [prev-keys (into #{} (keys prev-children))
+        curr-keys (into #{} (keys children))
         removed-keys (set/difference prev-keys curr-keys)
         added-children (->> (set/difference curr-keys prev-keys)
                             (map (fn [k] [k (get children k)])))
         common-keys (set/intersection prev-keys curr-keys)]
     (if (not (empty? removed-keys)) (collect! [coord :remove-children removed-keys]))
     (if (not (empty? added-children)) (collect! [coord :add-children added-children]))
-    (doseq [k common-keys]
-      (diff-tree (get prev-children k) (get children k) (conj coord k) collect!))))
+    (.log js/console "Common keys to diff:" common-keys prev-children children)
+    (doall
+     (doseq [k common-keys]
+       (.log js/console "Diffing children:" coord)
+       (diff-tree (get prev-children k) (get children k) (conj coord k) collect!)))))

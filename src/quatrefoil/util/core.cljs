@@ -19,6 +19,7 @@
     (if xs-empty?
       ys-empty?
       (if ys-empty?
+        false
         (if (identical? (first xs) (first ys)) (recur (rest xs) (rest ys)) false)))))
 
 (defn find-element [tree comp-coord]
