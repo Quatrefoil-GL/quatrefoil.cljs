@@ -45,7 +45,7 @@
                 (into {})))))))
 
 (defn render-component [markup prev-tree coord states build-mutate instants]
-  (.log js/console "Component states:" states)
+  (comment .log js/console "Component states:" states)
   (if (and (some? prev-tree)
            (let [prev-args (:args prev-tree)
                  prev-states (:states prev-tree)
