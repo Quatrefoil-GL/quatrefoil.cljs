@@ -14,7 +14,9 @@
         {:params {:x 0, :y (* idx -4)}}
         (sphere
          {:params {:radius 2, :x -20},
-          :material {:kind :mesh-lambert, :opacity 0.3, :color 0x9050ff},
+          :material {:kind :mesh-lambert,
+                     :opacity 0.3,
+                     :color (if (:done? task) 0x905055 0x9050ff)},
           :event {:click (fn [event dispatch!] (dispatch! :toggle-task (:id task)))}})
         (box
          {:params {:width 32, :height 4, :depth 1, :opacity 0.5},

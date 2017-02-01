@@ -25,4 +25,15 @@
       this.remove(v);
     }
   };
+
+  THREE.Object3D.prototype.replaceBy = function(k, v) {
+    if (this.childMap == null) {
+      console.warn('Calling replaceBy without childMap');
+    } else {
+      var prevChild = this.childMap[getStr(k)];
+      this.remove(prevChild);
+      this.childMap[k] = v;
+      this.add(v);
+    }
+  };
 })();
