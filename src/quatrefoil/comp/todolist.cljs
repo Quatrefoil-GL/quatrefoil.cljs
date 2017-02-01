@@ -11,7 +11,7 @@
    (fn [task idx]
      (fn [state mutate instant]
        (group
-        {:params {:x 0, :y (* idx -4)}}
+        {:params {:x 0, :y (* idx -8)}}
         (sphere
          {:params {:radius 2, :x -20},
           :material {:kind :mesh-lambert,

@@ -70,7 +70,7 @@
         curr-keys (into #{} (keys children))
         removed-keys (set/difference prev-keys curr-keys)
         added-children (->> (set/difference curr-keys prev-keys)
-                            (map (fn [k] [k (get children k)])))
+                            (map (fn [k] [k (purify-tree (get children k))])))
         common-keys (set/intersection prev-keys curr-keys)]
     (if (not (empty? removed-keys)) (collect! [coord :remove-children removed-keys]))
     (if (not (empty? added-children)) (collect! [coord :add-children added-children]))
