@@ -92,14 +92,6 @@
 
 (defonce virtual-tree-ref (atom {}))
 
-(defn remove-child [] )
-
-(defn append-child [] )
-
-(defn set-event [] )
-
-(defn set-param [] )
-
 (defn on-canvas-click [event dispatch! tree-ref]
   (let [mouse (js/THREE.Vector2.), raycaster (js/THREE.Raycaster.)]
     (set! mouse.x (dec (* 2 (/ event.clientX js/window.innerWidth))))
@@ -137,5 +129,3 @@
         (.addBy object3d (first entry) child)))
     (swap! virtual-tree-ref assoc-in (conj coord 'data) virtual-element)
     object3d))
-
-(defn set-material [] )

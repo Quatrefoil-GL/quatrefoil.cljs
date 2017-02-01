@@ -32,8 +32,17 @@
     } else {
       var prevChild = this.childMap[getStr(k)];
       this.remove(prevChild);
-      this.childMap[k] = v;
+      this.childMap[getStr(k)] = v;
       this.add(v);
+    }
+  };
+
+  THREE.Object3D.prototype.reachBy = function(k, v) {
+    if (this.childMap == null) {
+      console.warn('Calling reachBy without childMap');
+      return null;
+    } else {
+      return this.childMap[getStr(k)];
     }
   };
 })();

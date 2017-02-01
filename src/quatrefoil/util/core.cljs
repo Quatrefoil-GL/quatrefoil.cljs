@@ -1,6 +1,11 @@
 
 (ns quatrefoil.util.core (:require [quatrefoil.types :refer [Component Shape]]))
 
+(defn reach-object3d [object3d coord]
+  (if (empty? coord)
+    object3d
+    (let [cursor (first coord)] (recur (.reachBy object3d cursor) (rest coord)))))
+
 (defn comp? [x] (= Component (type x)))
 
 (defn purify-tree [tree]
