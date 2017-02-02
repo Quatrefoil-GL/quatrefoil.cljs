@@ -22,7 +22,7 @@
          {:params {:width 32, :height 4, :depth 1, :opacity 0.5},
           :material {:kind :mesh-lambert, :color 0xcccccc},
           :event {:click (fn [event dispatch!]
-                    (dispatch! :edit-task (js/prompt "New task:" (:text task))))}}
+                    (dispatch! :edit-task [(:id task) (js/prompt "New task:" (:text task))]))}}
          (text
           {:params {:text (:text task), :size 3, :height 2},
            :material {:kind :mesh-lambert, :color 0xffcccc}}))

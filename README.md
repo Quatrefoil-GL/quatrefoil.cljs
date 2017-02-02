@@ -4,6 +4,23 @@ Quatrefoil
 
 > Render Three.js with Respo style code.
 
+### Patching operations
+
+* [ ] `add-params`
+* [ ] `remove-params`
+* [ ] `update-params`
+* [ ] `add-events`
+* [ ] `remove-events`
+* [ ] `replace-material`
+* [ ] `add-material`
+* [ ] `remove-material`
+* [x] `update-material`
+* [ ] `add-element`
+* [ ] `remove-element`
+* [ ] `replace-element`
+* [x] `add-children`
+* [x] `remove-children`
+
 ### Develop
 
 ```bash

@@ -37,7 +37,7 @@
     }
   };
 
-  THREE.Object3D.prototype.reachBy = function(k, v) {
+  THREE.Object3D.prototype.reachBy = function(k) {
     if (this.childMap == null) {
       console.warn('Calling reachBy without childMap');
       return null;

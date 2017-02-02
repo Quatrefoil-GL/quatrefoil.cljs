@@ -15,7 +15,7 @@
     (doseq [entry op-data]
       (let [[param new-value] entry]
         (case param
-          :color (set! target.material.color (js/THREE.Color. new-value))
+          :color (.set target.material.color new-value)
           (do (.log js/console "Unknown param:" param)))))))
 
 (defn remove-children [coord op-data]

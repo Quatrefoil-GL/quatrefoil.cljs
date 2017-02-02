@@ -21,7 +21,7 @@
         (script {:attrs {:id "config" :type "text/edn" :innerHTML (pr-str data)}}))
       (body {}
         (div {:attrs {:id "app"}})
-        (script {:attrs {:src "https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.js"}})
+        (script {:attrs {:src "http://repo/quamolit/libs/three.js"}})
         (script {:attrs {:src "object3d.js"}})
         (script {:attrs {:src "main.js"}})))))
 
