@@ -7,7 +7,10 @@
   (let [cursor (first children)
         result (if (and (= 1 (count children)) (not (or (comp? cursor) (shape? cursor))))
                  (->> cursor (filter (fn [entry] (some? (last entry)))) (into {}))
-                 (->> children (filter some?) (map-indexed vector) (into {})))]
+                 (->> children
+                      (map-indexed vector)
+                      (filter (fn [entry] (some? (last entry))))
+                      (into {})))]
     (comment .log js/console "Handle children:" children result)
     result))
 

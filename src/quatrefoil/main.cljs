@@ -5,7 +5,7 @@
              [render! clear-cache! falsify-stage! render-element gc-states!]]
             [quatrefoil.comp.container :refer [comp-container]]
             [cljs.reader :refer [read-string]]
-            [quatrefoil.core :refer [render-canvas! tree-ref]]
+            [quatrefoil.core :refer [render-canvas! tree-ref clear-cache!]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
             [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]
@@ -62,6 +62,6 @@
   (add-watch states-ref :changes render-canvas-app!)
   (println "App started!"))
 
-(defn on-jsload! [] (render-canvas-app!) (println "Code updated."))
+(defn on-jsload! [] (clear-cache!) (render-canvas-app!) (println "Code updated."))
 
 (set! (.-onload js/window) -main!)

@@ -6,20 +6,20 @@ Quatrefoil
 
 ### Patching operations
 
-* [ ] `add-params`
-* [ ] `remove-params`
-* [ ] `update-params`
-* [ ] `add-events`
-* [ ] `remove-events`
-* [ ] `replace-material`
-* [ ] `add-material`
-* [ ] `remove-material`
-* [x] `update-material`
-* [ ] `add-element`
-* [ ] `remove-element`
-* [ ] `replace-element`
+* [x] `add-element`
+* [x] `remove-element`
+* [x] `replace-element`
 * [x] `add-children`
 * [x] `remove-children`
+* [x] `add-material`
+* [x] `update-material`
+* [ ] `replace-material`
+* [ ] `remove-material`
+* [x] `add-params`(partial)
+* [x] `update-params`
+* [ ] `remove-params`
+* [ ] `add-events`
+* [ ] `remove-events`
 
 ### Develop
 

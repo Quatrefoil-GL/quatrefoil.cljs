@@ -31,13 +31,13 @@
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y params) (:z params))
     (set! object3d.coord comp-coord)
-    (.log js/console "Sphere:" object3d)
+    (comment .log js/console "Sphere:" object3d)
     object3d))
 
 (defn create-box-element [params material event comp-coord]
   (let [geometry (js/THREE.BoxGeometry. (:width params) (:height params) (:depth params))
         object3d (js/THREE.Mesh. geometry (create-material material))]
-    (.set object3d.position (:x params) (:y (:y params)) (:z (:z params)))
+    (.set object3d.position (:x params) (:y params) (:z params))
     (set! object3d.coord comp-coord)
     object3d))
 
@@ -66,7 +66,7 @@
         distance (:distance params)
         object3d (js/THREE.PointLight. color intensity distance)]
     (.set object3d.position (:x params) (:y params) (:z params))
-    (.log js/console "Light:" object3d)
+    (comment .log js/console "Light:" object3d)
     object3d))
 
 (defn create-group-element [params]

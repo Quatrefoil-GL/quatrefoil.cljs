@@ -3,7 +3,9 @@
   (:require [quatrefoil.dsl.alias
              :refer
              [create-comp group box sphere point-light perspective-camera scene text]]
-            [quatrefoil.comp.todolist :refer [comp-todolist]]))
+            [quatrefoil.comp.todolist :refer [comp-todolist]]
+            [quatrefoil.comp.portal :refer [comp-portal]]
+            [quatrefoil.comp.back :refer [comp-back]]))
 
 (def comp-demo
   (create-comp
@@ -14,14 +16,14 @@
        (group
         {}
         (box
-         {:params {:width 16, :height 4, :depth 6},
+         {:params {:width 16, :height 4, :depth 6, :x -40, :y 0, :z 0},
           :material {:kind :mesh-lambert, :color 0x808080, :opacity 0.6},
           :event {:click (fn [event dispatch!]
                     (.log js/console "Click:" event)
                     (dispatch! :demo nil)
                     (mutate! "Mutate demo"))}})
         (sphere
-         {:params {:radius 4, :x 40},
+         {:params {:radius 8, :x 10},
           :material {:kind :mesh-lambert, :opacity 0.6, :color 0x9050c0},
           :event {:click (fn [event dispatch!]
                     (.log js/console "Click:" event)
@@ -29,19 +31,28 @@
         (group
          {}
          (text
-          {:params {:text "Quatrefoil", :size 4, :height 2, :z 40},
+          {:params {:text "Quatrefoil", :size 4, :height 2, :z 40, :x -20},
            :material {:kind :mesh-lambert, :color 0xffcccc}})))))))
+
+(defn init-state [& args] :portal)
+
+(defn update-state [state new-state] new-state)
 
 (def comp-canvas
   (create-comp
    :canvas
-   {}
+   {:init-state init-state, :update-state update-state}
    (fn [store]
      (fn [state mutate! instant]
+       (println "State:" state)
        (scene
         {}
-        (comp-demo)
-        (comp-todolist (:tasks store))
+        (case state
+          :portal (comp-portal mutate!)
+          :todolist (comp-todolist (:tasks store))
+          :demo (comp-demo)
+          nil)
+        (if (not= state :portal) (comp-back mutate!))
         (point-light
          {:params {:color 0xffaaaa, :x 0, :y 40, :z 60, :intensity 2, :distance 400}})
         (perspective-camera

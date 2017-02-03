@@ -42,14 +42,10 @@
         (group
          {:params {:y 40, :x 0, :z 0}}
          (box
-          {:params {:width 32, :height 4, :depth 1, :opacity 0.5},
-           :material {:kind :mesh-lambert, :color 0xcccccc},
+          {:params {:width 32, :height 6, :depth 1, :opacity 0.5},
+           :material {:kind :mesh-lambert, :color 0xffaaaa},
            :event {:click (fn [event dispatch!]
-                     (dispatch! :add-task (js/prompt "Task content?")))}})
-         (sphere
-          {:params {:radius 4, :x 40},
-           :material {:kind :mesh-lambert, :opacity 0.3, :color 0x9050ff},
-           :event {}}))
+                     (dispatch! :add-task (js/prompt "Task content?")))}}))
         (group
          {:params {:y 30, :x 0, :z 0}}
          (->> (vals tasks)

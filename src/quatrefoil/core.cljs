@@ -6,6 +6,8 @@
             [quatrefoil.util.core :refer [purify-tree]]
             [quatrefoil.dsl.patch :refer [apply-changes]]))
 
+(defonce tree-cache-ref (atom nil))
+
 (defonce tree-ref (atom nil))
 
 (defn render-canvas! [markup states-ref instants scene]
@@ -14,7 +16,7 @@
                        (swap! states-ref assoc-in (conj coord 'data) new-state))
         new-tree (render-component
                   markup
-                  @tree-ref
+                  @tree-cache-ref
                   []
                   (get @states-ref (:name markup))
                   build-mutate
@@ -26,4 +28,7 @@
         (apply-changes @changes-ref))
       (build-tree [] (purify-tree new-tree)))
     (reset! tree-ref new-tree)
+    (reset! tree-cache-ref new-tree)
     (comment .log js/console "Tree:" new-tree)))
+
+(defn clear-cache! [] (reset! tree-cache-ref nil))
