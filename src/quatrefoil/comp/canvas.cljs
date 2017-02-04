@@ -31,7 +31,7 @@
         (group
          {}
          (text
-          {:params {:text "Quatrefoil", :size 4, :height 2, :z 40, :x -20},
+          {:params {:text "Quatrefoil", :size 4, :height 2, :z 20, :x -30},
            :material {:kind :mesh-lambert, :color 0xffcccc}})))))))
 
 (defn init-state [& args] :portal)
@@ -54,7 +54,7 @@
           nil)
         (if (not= state :portal) (comp-back mutate!))
         (point-light
-         {:params {:color 0xffaaaa, :x 0, :y 40, :z 60, :intensity 2, :distance 400}})
+         {:params {:color 0xffffff, :x 20, :y 40, :z 100, :intensity 2, :distance 400}})
         (perspective-camera
          {:params {:x 0,
                    :y 0,

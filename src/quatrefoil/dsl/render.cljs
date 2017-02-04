@@ -7,7 +7,14 @@
 
 (declare render-markup)
 
-(defn render-markup [markup prev-markup coord comp-coord states build-mutate instants]
+(defn render-markup [markup
+                     prev-markup
+                     coord
+                     comp-coord
+                     states
+                     build-mutate
+                     instants
+                     collect-variation!]
   (if (comp? markup)
     (render-component
      markup
@@ -15,10 +22,26 @@
      coord
      (get states (:name markup))
      build-mutate
-     instants)
-    (render-shape markup prev-markup coord comp-coord states build-mutate instants)))
+     instants
+     collect-variation!)
+    (render-shape
+     markup
+     prev-markup
+     coord
+     comp-coord
+     states
+     build-mutate
+     instants
+     collect-variation!)))
 
-(defn render-shape [markup prev-markup coord comp-coord states build-mutate instants]
+(defn render-shape [markup
+                    prev-markup
+                    coord
+                    comp-coord
+                    states
+                    build-mutate
+                    instants
+                    collect-variation!]
   (let [prev-children (:children prev-markup)]
     (comment .log js/console "Shape:" markup)
     (-> markup
@@ -41,10 +64,17 @@
                          comp-coord
                          (get states k)
                          build-mutate
-                         (get instants k)))))))
+                         (get instants k)
+                         collect-variation!))))))
                 (into {})))))))
 
-(defn render-component [markup prev-tree coord states build-mutate instants]
+(defn render-component [markup
+                        prev-tree
+                        coord
+                        states
+                        build-mutate
+                        instants
+                        collect-variation!]
   (comment .log js/console "Component states:" states)
   (if (and (some? prev-tree)
            (let [prev-args (:args prev-tree)
@@ -80,6 +110,7 @@
                     base-coord
                     states
                     build-mutate
-                    instant))]
+                    instant
+                    collect-variation!))]
       (comment .log js/console "Creating new component:" coord)
       (merge markup {:tree tree, :states states, :instants instants}))))

@@ -8,19 +8,24 @@
 
 (defonce tree-cache-ref (atom nil))
 
+(defonce instant-variation-ref (atom []))
+
 (defonce tree-ref (atom nil))
 
 (defn render-canvas! [markup states-ref instants scene]
   (let [build-mutate (fn [coord new-state]
                        (println "Mutate states:" new-state)
                        (swap! states-ref assoc-in (conj coord 'data) new-state))
+        collect-variation! (fn [coord new-instant]
+                             (swap! instant-variation-ref conj [coord new-instant]))
         new-tree (render-component
                   markup
                   @tree-cache-ref
                   []
                   (get @states-ref (:name markup))
                   build-mutate
-                  instants)]
+                  instants
+                  collect-variation!)]
     (if (some? @tree-ref)
       (let [changes-ref (atom []), collect! (fn [x] (swap! changes-ref conj x))]
         (diff-tree @tree-ref new-tree [] collect!)
@@ -29,6 +34,7 @@
       (build-tree [] (purify-tree new-tree)))
     (reset! tree-ref new-tree)
     (reset! tree-cache-ref new-tree)
-    (comment .log js/console "Tree:" new-tree)))
+    (comment .log js/console "Tree:" new-tree)
+    (.log js/console "Variations" @instant-variation-ref)))
 
 (defn clear-cache! [] (reset! tree-cache-ref nil))
