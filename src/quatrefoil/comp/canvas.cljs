@@ -5,7 +5,8 @@
              [create-comp group box sphere point-light perspective-camera scene text]]
             [quatrefoil.comp.todolist :refer [comp-todolist]]
             [quatrefoil.comp.portal :refer [comp-portal]]
-            [quatrefoil.comp.back :refer [comp-back]]))
+            [quatrefoil.comp.back :refer [comp-back]]
+            [quatrefoil.comp.fade-in-out :refer [comp-fade-in-out]]))
 
 (def comp-demo
   (create-comp
@@ -44,7 +45,6 @@
    {:init-state init-state, :update-state update-state}
    (fn [store]
      (fn [state mutate! instant]
-       (println "State:" state)
        (scene
         {}
         (case state
@@ -52,7 +52,7 @@
           :todolist (comp-todolist (:tasks store))
           :demo (comp-demo)
           nil)
-        (if (not= state :portal) (comp-back mutate!))
+        (if (not= state :portal) (comp-fade-in-out (comp-back mutate!)))
         (point-light
          {:params {:color 0xffffff, :x 20, :y 40, :z 100, :intensity 2, :distance 400}})
         (perspective-camera

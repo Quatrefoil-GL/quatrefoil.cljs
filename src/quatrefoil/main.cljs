@@ -5,7 +5,9 @@
              [render! clear-cache! falsify-stage! render-element gc-states!]]
             [quatrefoil.comp.container :refer [comp-container]]
             [cljs.reader :refer [read-string]]
-            [quatrefoil.core :refer [render-canvas! tree-ref clear-cache!]]
+            [quatrefoil.core
+             :refer
+             [render-canvas! tree-ref clear-cache! instant-variation-ref write-instants!]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
             [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]
@@ -25,9 +27,14 @@
 (defonce states-ref (atom {}))
 
 (defn render-canvas-app! []
-  (.log js/console "Rerender" @store-ref @states-ref)
+  (.log js/console "Rerender" @store-ref @states-ref @instants-ref)
+  (reset! instant-variation-ref [])
   (render-canvas! (comp-canvas @store-ref) states-ref @instants-ref global-scene)
-  (.render @renderer-ref global-scene @camera-ref))
+  (.render @renderer-ref global-scene @camera-ref)
+  (if (not (empty? @instant-variation-ref))
+    (do
+     (write-instants! instants-ref @instant-variation-ref)
+     (js/setTimeout render-canvas-app! 400))))
 
 (defn render-app! []
   (let [target (.querySelector js/document "#app")]
@@ -52,6 +59,7 @@
     (reset!
      renderer-ref
      (js/THREE.WebGLRenderer. (clj->js {:canvas canvas-el, :antialias true})))
+    (.setPixelRatio @renderer-ref (or js/window.devicePixelRatio 1))
     (.addEventListener
      canvas-el
      "click"

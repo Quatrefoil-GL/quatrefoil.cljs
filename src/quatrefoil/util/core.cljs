@@ -27,6 +27,19 @@
         false
         (if (identical? (first xs) (first ys)) (recur (rest xs) (rest ys)) false)))))
 
+(defn =component? [prev-tree markup]
+  (let [prev-args (:args prev-tree)
+        prev-states (:states prev-tree)
+        prev-instants (:instants prev-tree)]
+    (comment
+     println
+     (=seq? (:args markup) prev-args)
+     (identical? (:states markup) prev-states)
+     (identical? (:instants markup) prev-instants))
+    (and (=seq? (:args markup) prev-args)
+         (identical? (:states markup) prev-states)
+         (identical? (:instants markup) prev-instants))))
+
 (defn find-element [tree comp-coord]
   (comment .log js/console "Find..." tree comp-coord)
   (if (empty? comp-coord)
