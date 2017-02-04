@@ -26,15 +26,20 @@
 
 (defonce states-ref (atom {}))
 
+(defonce ref-task (atom nil))
+
 (defn render-canvas-app! []
-  (.log js/console "Rerender" @store-ref @states-ref @instants-ref)
-  (reset! instant-variation-ref [])
+  (if (some? @ref-task) (do (js/clearTimeout @ref-task) (reset! ref-task nil)))
+  (comment println "Render app:" (pr-str @instants-ref))
   (render-canvas! (comp-canvas @store-ref) states-ref @instants-ref global-scene)
   (.render @renderer-ref global-scene @camera-ref)
   (if (not (empty? @instant-variation-ref))
     (do
      (write-instants! instants-ref @instant-variation-ref)
-     (js/setTimeout render-canvas-app! 100))))
+     (reset! instant-variation-ref [])
+     (reset!
+      ref-task
+      (js/requestAnimationFrame (fn [] (reset! ref-task nil) (render-canvas-app!)) 40)))))
 
 (defn render-app! []
   (let [target (.querySelector js/document "#app")]

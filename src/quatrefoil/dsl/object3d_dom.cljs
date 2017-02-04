@@ -1,6 +1,8 @@
 
 (ns quatrefoil.dsl.object3d-dom
-  (:require [quatrefoil.util.core :refer [purify-tree collect-children find-element]]))
+  (:require [quatrefoil.util.core
+             :refer
+             [purify-tree collect-children find-element scale-zero]]))
 
 (defonce camera-ref (atom nil))
 
@@ -30,6 +32,11 @@
                   (or (:height-segments params) 32))
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y params) (:z params))
+    (.set
+     object3d.scale
+     (scale-zero (:scale-x params))
+     (scale-zero (:scale-y params))
+     (scale-zero (:scale-y params)))
     (set! object3d.coord comp-coord)
     (comment .log js/console "Sphere:" object3d)
     object3d))
@@ -38,6 +45,11 @@
   (let [geometry (js/THREE.BoxGeometry. (:width params) (:height params) (:depth params))
         object3d (js/THREE.Mesh. geometry (create-material material))]
     (.set object3d.position (:x params) (:y params) (:z params))
+    (.set
+     object3d.scale
+     (scale-zero (:scale-x params))
+     (scale-zero (:scale-y params))
+     (scale-zero (:scale-y params)))
     (set! object3d.coord comp-coord)
     object3d))
 
@@ -49,6 +61,8 @@
       "hind.json"
       (fn [response] (.log js/console response) (reset! font-ref response))))
    (atom (js/THREE.Font. nil))))
+
+(def default-params {:x 0, :y 0, :z 0, :scale-x 1, :scale-y 1, :scale-z 1})
 
 (defn create-text-element [params material]
   (let [geometry (js/THREE.TextGeometry.
@@ -72,11 +86,12 @@
 (defn create-group-element [params]
   (let [object3d (js/THREE.Group.)]
     (.set object3d.position (:x params) (:y params) (:z params))
+    (.set object3d.scale (:scale-x params) (:scale-y params) (:scale-y params))
     object3d))
 
 (defn create-element [element]
   (comment .log js/console "Element:" element (:coord element))
-  (let [params (or (:params element) {})
+  (let [params (merge default-params (:params element))
         material (or (:material element) {:kind :mesh-basic, :color 0xa0a0a0})
         event (:event element)
         coord (:coord element)]

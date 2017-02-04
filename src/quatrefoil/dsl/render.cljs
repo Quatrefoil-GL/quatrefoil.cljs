@@ -9,8 +9,8 @@
 
 (declare render-markup)
 
-(defn get-instant [instants init-instant args state at-place?]
-  (if (contains? instants 'data)
+(defn get-instant [instants init-instant args state at-place? has-prev?]
+  (if (and has-prev? (contains? instants 'data))
     (get instants 'data)
     (if (fn? init-instant) (init-instant args state at-place?) nil)))
 
@@ -81,6 +81,7 @@
 
 (defn render-component [markup prev-markup coord states instants packed]
   (comment .log js/console "Component states:" states)
+  (comment println "Instants:" coord instants)
   (if (and (nil? markup) (nil? prev-markup))
     (do (.warn js/console "Calling render-component with nil!") nil)
     (let [elapsed (:elapsed packed)
@@ -96,7 +97,7 @@
           on-update (:on-update hooks)
           remove? (:remove? hooks)
           state (get-state states (:init-state hooks) args)
-          instant (get-instant instants init-instant args state true)
+          instant (get-instant instants init-instant args state true (some? prev-markup))
           build-mutate (:build-mutate packed)
           mutate! (fn [& state-args]
                     (let [update-state (:update-state hooks)
@@ -117,14 +118,16 @@
                                       instants
                                       packed)]
                             (merge
-                             (or markup prev-markup)
+                             base-tree
                              {:tree tree,
                               :states (assoc states 'data state),
                               :instants (assoc instants :data the-instant),
                               :removing? removing?})))]
       (cond
         (and (some? markup) (nil? prev-markup))
-          (do (queue! coord instant :init) (render-result instant false))
+          (do
+           (if (some? instant) (queue! base-coord instant :init))
+           (render-result instant false))
         (and (some? markup) (some? prev-markup) (=component? prev-markup markup))
           (do (comment .log js/console "Reusing component:" coord) prev-markup)
         (and (some? markup) (some? prev-markup))
@@ -135,24 +138,26 @@
                                args
                                (:states prev-markup)
                                state)]
-              (if (not (identical? instant new-instant))
-                (do (queue! coord new-instant :1) (render-result new-instant false))
+              (if (not= instant new-instant)
+                (do (queue! base-coord new-instant :update) (render-result new-instant false))
                 (let [ticked-instant (on-tick instant elapsed)]
-                  (if (not (identical? instant ticked-instant))
-                    (queue! coord ticked-instant :2))
+                  (if (not= instant ticked-instant)
+                    (queue! base-coord ticked-instant :tick-on-update))
                   (render-result ticked-instant false))))
             (let [new-instant (on-tick instant elapsed)]
-              (if (not (identical? instant new-instant)) (queue! coord new-instant :3))
+              (if (not= instant new-instant) (queue! base-coord new-instant :tick))
               (render-result new-instant false)))
         (and (nil? markup) (some? prev-markup) (:removing? prev-markup))
           (let [new-instant (on-tick instant elapsed)]
             (if (remove? new-instant)
               nil
-              (do (queue! coord new-instant :removing) (render-result new-instant true))))
+              (do
+               (queue! base-coord new-instant :removing)
+               (render-result new-instant true))))
         (and (nil? markup) (some? prev-markup) (not (:removing? prev-markup)))
           (if (fn? on-unmount)
             (let [new-instant (on-unmount instant)]
-              (queue! coord new-instant :unmount)
+              (queue! base-coord new-instant :unmount)
               (render-result new-instant true))
             nil)
         :else (do (.warn js/console "Unexpected case:" markup prev-markup))))))

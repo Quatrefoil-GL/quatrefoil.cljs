@@ -27,13 +27,12 @@
                   @tree-cache-ref
                   []
                   (get @states-ref (:name markup))
-                  instants
+                  (get instants (:name markup))
                   packed)]
     (reset! timestamp-ref now)
     (if (some? @tree-ref)
       (let [changes-ref (atom []), collect! (fn [x] (swap! changes-ref conj x))]
         (diff-tree @tree-ref new-tree [] collect!)
-        (.log js/console "Changes:" @changes-ref)
         (apply-changes @changes-ref))
       (build-tree [] (purify-tree new-tree)))
     (reset! tree-ref new-tree)

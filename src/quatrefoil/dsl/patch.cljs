@@ -1,7 +1,7 @@
 
 (ns quatrefoil.dsl.patch
   (:require [quatrefoil.dsl.object3d-dom :refer [global-scene build-tree]]
-            [quatrefoil.util.core :refer [reach-object3d]]))
+            [quatrefoil.util.core :refer [reach-object3d scale-zero]]))
 
 (defn add-element [coord op-data]
   (if (empty? coord)
@@ -48,6 +48,9 @@
           :x (.setX target.position v)
           :y (.setY target.position v)
           :z (.setZ target.position v)
+          :scale-x (.setX target.scale (scale-zero v))
+          :scale-y (.setY target.scale (scale-zero v))
+          :scale-z (.setZ target.scale (scale-zero v))
           :radius (set! target.geometry.radius v)
           (do (.log js/console "Unknown param change:" k v)))))))
 
