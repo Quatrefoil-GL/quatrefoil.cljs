@@ -23,49 +23,31 @@
     (get states 'data)
     (if (fn? init-state) (apply init-state args) nil)))
 
-(defn render-markup [markup
-                     prev-markup
-                     coord
-                     comp-coord
-                     states
-                     build-mutate
-                     instants
-                     collect-variation!
-                     elapsed]
+(defn render-markup [markup prev-markup coord comp-coord states instants packed]
   (cond
-    (or (comp? markup) (comp? prev-markup))
-      (render-component
-       (if (comp? markup) markup nil)
-       (if (comp? prev-markup) prev-markup nil)
-       coord
-       (get states (:name markup))
-       build-mutate
-       instants
-       collect-variation!
-       elapsed)
-    (shape? markup)
-      (render-shape
-       markup
-       prev-markup
-       coord
-       comp-coord
-       states
-       build-mutate
-       instants
-       collect-variation!
-       elapsed)
+    (and (nil? markup) (nil? prev-markup)) nil
+    (and (comp? markup) (or (nil? prev-markup) (shape? prev-markup)))
+      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
+        (render-component markup nil coord child-states child-instants packed))
+    (and (comp? prev-markup) (nil? markup))
+      (let [k (:name prev-markup)
+            child-states (get states k)
+            child-instants (get instants k)]
+        (render-component nil prev-markup coord child-states child-instants packed))
+    (and (comp? prev-markup) (comp? markup) (= (:name prev-markup) (:name markup)))
+      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
+        (render-component markup prev-markup coord child-states child-instants packed))
+    (and (comp? prev-markup) (comp? markup) (not= (:name prev-markup) (:name markup)))
+      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
+        (render-component markup nil coord child-states child-instants packed))
+    (and (shape? markup) (or (nil? prev-markup) (comp? prev-markup)))
+      (render-shape markup nil coord comp-coord states instants packed)
+    (and (shape? markup) (shape? prev-markup))
+      (render-shape markup prev-markup coord comp-coord states instants packed)
     (and (nil? markup) (shape? prev-markup)) nil
     :else (do (.log js/console "Unknown markup with" markup prev-markup) nil)))
 
-(defn render-shape [markup
-                    prev-markup
-                    coord
-                    comp-coord
-                    states
-                    build-mutate
-                    instants
-                    collect-variation!
-                    elapsed]
+(defn render-shape [markup prev-markup coord comp-coord states instants packed]
   (let [prev-children (:children prev-markup)
         children (:children markup)
         all-keys (set/union (into #{} (keys prev-children)) (into #{} (keys children)))]
@@ -87,24 +69,15 @@
                        (conj coord k)
                        comp-coord
                        (get states k)
-                       build-mutate
                        (get instants k)
-                       collect-variation!
-                       elapsed)))]))
+                       packed)))]))
               (filter
                (fn [entry]
                  (comment .log js/console "Rendering child:" entry)
                  (some? (last entry))))
               (into {}))))))
 
-(defn render-component [markup
-                        prev-tree
-                        coord
-                        states
-                        build-mutate
-                        instants
-                        collect-variation!
-                        elapsed]
+(defn render-component [markup prev-tree coord states instants packed]
   (comment .log js/console "Component states:" states)
   (if (and (nil? markup) (nil? prev-tree))
     (do (.warn js/console "Calling render-component with nil!") nil)
@@ -122,14 +95,18 @@
           state (get-state states (:init-state hooks) args)
           instant (get-instant instants init-instant args state true)
           next-instant (if (fn? on-tick)
-                         (do (.log js/console "Tick:" elapsed) (on-tick instant elapsed))
+                         (do
+                          (.log js/console "Tick:" (:elapsed packed))
+                          (on-tick instant (:elapsed packed)))
                          instant)
           next-instants (assoc instants 'data next-instant)
+          build-mutate (:build-mutate packed)
           mutate! (fn [& state-args]
                     (let [update-state (:update-state hooks)
                           new-state (apply update-state (cons state state-args))]
                       (.log js/console "During mutate:" base-coord state new-state states)
                       (build-mutate base-coord new-state)))
+          queue! (:queue! packed)
           tree (-> render
                    (apply args)
                    (apply (list state mutate! next-instant))
@@ -138,10 +115,8 @@
                     base-coord
                     base-coord
                     states
-                    build-mutate
                     instants
-                    collect-variation!
-                    elapsed))
+                    packed))
           result (merge
                   base-tree
                   {:tree tree, :states (assoc states 'data state), :instants next-instants})]
@@ -160,15 +135,13 @@
                                    (:states prev-tree)
                                    state)]
                   (if (not (identical? instant new-instant))
-                    (collect-variation! base-coord new-instant :update))
+                    (queue! base-coord new-instant :update))
                   (merge result {:instants (assoc instants 'data new-instant)}))
                 (do
-                 (if (not= instant next-instant)
-                   (collect-variation! base-coord next-instant :tick))
+                 (if (not= instant next-instant) (queue! base-coord next-instant :tick))
                  result))
               (do
-               (if (contains? hooks :init-instant)
-                 (collect-variation! base-coord instant :init))
+               (if (contains? hooks :init-instant) (queue! base-coord instant :init))
                result))))
         (if (:removing? prev-tree)
           (if (fn? remove?) (if (remove? next-instant) nil result) nil)

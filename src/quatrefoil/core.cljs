@@ -18,18 +18,17 @@
   (let [build-mutate (fn [coord new-state]
                        (println "Mutate states:" new-state)
                        (swap! states-ref assoc-in (conj coord 'data) new-state))
-        collect-variation! (fn [coord new-instant mark]
-                             (swap! instant-variation-ref conj [coord new-instant mark]))
+        queue! (fn [coord new-instant mark]
+                 (swap! instant-variation-ref conj [coord new-instant mark]))
         now (js/Date.now)
+        packed {:build-mutate build-mutate, :queue! queue!, :elapsed (- now @timestamp-ref)}
         new-tree (render-component
                   markup
                   @tree-cache-ref
                   []
                   (get @states-ref (:name markup))
-                  build-mutate
                   instants
-                  collect-variation!
-                  (- now @timestamp-ref))]
+                  packed)]
     (reset! timestamp-ref now)
     (if (some? @tree-ref)
       (let [changes-ref (atom []), collect! (fn [x] (swap! changes-ref conj x))]
