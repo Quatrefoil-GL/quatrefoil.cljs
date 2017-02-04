@@ -36,18 +36,18 @@
     (cljs :compiler-options {:language-in :ecmascript5})
     (target :no-clean true)))
 
-(deftask build-advanced []
+(deftask build-whitespace []
   (set-env!
     :asset-paths #{"assets/"})
   (comp
-    (cljs :optimizations :advanced
+    (cljs :optimizations :whitespace
           :compiler-options {:language-in :ecmascript5
                              :pseudo-names true
                              :static-fns true
                              :parallel-build true
                              :optimize-constants true
                              :source-map true})
-    (target)))
+    (target :no-clean true)))
 
 (deftask build []
   (comp

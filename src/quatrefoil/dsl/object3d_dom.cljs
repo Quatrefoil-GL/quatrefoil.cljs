@@ -53,13 +53,18 @@
     (set! object3d.coord comp-coord)
     object3d))
 
+(defonce ref-dirty-call! (atom nil))
+
 (defonce font-ref
   (do
    (let [loader (THREE.FontLoader.)]
      (.load
       loader
       "hind.json"
-      (fn [response] (.log js/console response) (reset! font-ref response))))
+      (fn [response]
+        (.log js/console response)
+        (@ref-dirty-call!)
+        (reset! font-ref response))))
    (atom (js/THREE.Font. nil))))
 
 (def default-params {:x 0, :y 0, :z 0, :scale-x 1, :scale-y 1, :scale-z 1})

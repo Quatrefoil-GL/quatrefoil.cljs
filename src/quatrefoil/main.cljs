@@ -10,7 +10,9 @@
              [render-canvas! tree-ref clear-cache! instant-variation-ref write-instants!]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
             [devtools.core :as devtools]
-            [quatrefoil.dsl.object3d-dom :refer [camera-ref global-scene on-canvas-click]]
+            [quatrefoil.dsl.object3d-dom
+             :refer
+             [camera-ref global-scene on-canvas-click ref-dirty-call!]]
             [quatrefoil.updater.core :refer [updater]]))
 
 (defonce store-ref (atom {:tasks {100 {:id 100, :text "Initial task", :done? false}}}))
@@ -77,4 +79,4 @@
 
 (defn on-jsload! [] (clear-cache!) (render-canvas-app!) (println "Code updated."))
 
-(set! (.-onload js/window) -main!)
+(reset! ref-dirty-call! (fn [] (js/setTimeout -main! 100)))

@@ -2,7 +2,9 @@
 Quatrefoil
 ----
 
-> Render Three.js with Respo style code.
+> Render Three.js with Respo style code(experimental).
+
+Demo http://repo.quamolit.org/quatrefoil/
 
 ### Patching operations
 

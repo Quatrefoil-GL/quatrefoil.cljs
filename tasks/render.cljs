@@ -21,7 +21,8 @@
         (script {:attrs {:id "config" :type "text/edn" :innerHTML (pr-str data)}}))
       (body {}
         (div {:attrs {:id "app"}})
-        (script {:attrs {:src "http://repo/quamolit/libs/three.js"}})
+        ; (script {:attrs {:src "http://repo/quamolit/libs/three.js"}})
+        (script {:attrs {:src "https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"}})
         (script {:attrs {:src "object3d.js"}})
         (script {:attrs {:src "main.js"}})))))
 
@@ -40,6 +41,6 @@
 (defn -main []
   (if (= js/process.env.env "dev")
     (spit "target/dev.html" (generate-empty-html))
-    (spit "target/index.html" (generate-html #{:shell}))))
+    (spit "target/index.html" (generate-empty-html))))
 
 (-main)
