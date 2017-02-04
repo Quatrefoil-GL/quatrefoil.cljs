@@ -6,9 +6,10 @@
 
 (defn on-tick [instant elapsed]
   (let [next-presence (+ (:presence instant) (* elapsed (:presence-v instant)))]
+    (.log js/console "Next presence:" next-presence elapsed (:presence-v instant))
     (if (<= next-presence 0)
       {:presence 0, :presence-v 0}
-      (if (>= next-presence 1)
+      (if (>= next-presence 1000)
         {:presence 1, :presence-v 0}
         (assoc instant :presence next-presence)))))
 

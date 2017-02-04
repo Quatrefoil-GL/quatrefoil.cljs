@@ -33,10 +33,10 @@
                      collect-variation!
                      elapsed]
   (cond
-    (comp? markup)
+    (or (comp? markup) (comp? prev-markup))
       (render-component
-       markup
-       prev-markup
+       (if (comp? markup) markup nil)
+       (if (comp? prev-markup) prev-markup nil)
        coord
        (get states (:name markup))
        build-mutate
@@ -54,6 +54,7 @@
        instants
        collect-variation!
        elapsed)
+    (and (nil? markup) (shape? prev-markup)) nil
     :else (do (.log js/console "Unknown markup with" markup prev-markup) nil)))
 
 (defn render-shape [markup
@@ -120,7 +121,9 @@
           remove? (:remove? hooks)
           state (get-state states (:init-state hooks) args)
           instant (get-instant instants init-instant args state true)
-          next-instant (if (fn? on-tick) (on-tick instant elapsed) instant)
+          next-instant (if (fn? on-tick)
+                         (do (.log js/console "Tick:" elapsed) (on-tick instant elapsed))
+                         instant)
           next-instants (assoc instants 'data next-instant)
           mutate! (fn [& state-args]
                     (let [update-state (:update-state hooks)
@@ -140,14 +143,14 @@
                     collect-variation!
                     elapsed))
           result (merge
-                  markup
+                  base-tree
                   {:tree tree, :states (assoc states 'data state), :instants next-instants})]
       (if (some? markup)
         (if (and (some? prev-tree) (=component? prev-tree markup))
           (do (comment .log js/console "Reusing component:" coord) prev-tree)
           (let []
             (comment .log js/console "Creating new component:" coord)
-            (.log js/console "Comparing instants:" instant next-instant)
+            (comment .log js/console "Comparing instants:" instant next-instant)
             (if (some? prev-tree)
               (if (and (fn? on-update) (updated? markup prev-tree))
                 (let [new-instant (on-update

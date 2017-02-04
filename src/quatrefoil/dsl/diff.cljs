@@ -48,7 +48,7 @@
         (collect! [coord :update-material updated-material])))))
 
 (defn diff-tree [prev-tree tree coord collect!]
-  (comment .log js/console "Diffing:" coord (some? prev-tree) (some? tree))
+  (comment .log js/console "Diffing:" coord prev-tree tree)
   (cond
     (comp? prev-tree) (recur (:tree prev-tree) tree coord collect!)
     (comp? tree) (recur prev-tree (:tree tree) coord collect!)

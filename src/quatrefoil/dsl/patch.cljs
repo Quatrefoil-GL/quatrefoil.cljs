@@ -54,7 +54,7 @@
 (defn apply-changes [changes]
   (doseq [change changes]
     (let [[coord op op-data] change]
-      (.log js/console "Change:" op coord)
+      (comment .log js/console "Change:" op coord)
       (case op
         :add-material (update-material coord op-data)
         :update-material (update-material coord op-data)

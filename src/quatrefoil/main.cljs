@@ -34,7 +34,7 @@
   (if (not (empty? @instant-variation-ref))
     (do
      (write-instants! instants-ref @instant-variation-ref)
-     (js/setTimeout render-canvas-app! 400))))
+     (js/setTimeout render-canvas-app! 100))))
 
 (defn render-app! []
   (let [target (.querySelector js/document "#app")]
