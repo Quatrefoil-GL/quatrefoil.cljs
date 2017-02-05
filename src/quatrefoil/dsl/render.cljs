@@ -25,31 +25,31 @@
     (get states 'data)
     (if (fn? init-state) (apply init-state args) nil)))
 
-(defn render-markup [markup prev-markup coord comp-coord states instants packed]
+(defn render-markup [markup prev-markup coord comp-coord states instants new? packed]
   (cond
     (and (nil? markup) (nil? prev-markup)) nil
     (and (comp? markup) (or (nil? prev-markup) (shape? prev-markup)))
       (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
-        (render-component markup nil coord child-states child-instants packed))
+        (render-component markup nil coord child-states child-instants new? packed))
     (and (comp? prev-markup) (nil? markup))
       (let [k (:name prev-markup)
             child-states (get states k)
             child-instants (get instants k)]
-        (render-component nil prev-markup coord child-states child-instants packed))
+        (render-component nil prev-markup coord child-states child-instants new? packed))
     (and (comp? prev-markup) (comp? markup) (= (:name prev-markup) (:name markup)))
       (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
-        (render-component markup prev-markup coord child-states child-instants packed))
+        (render-component markup prev-markup coord child-states child-instants new? packed))
     (and (comp? prev-markup) (comp? markup) (not= (:name prev-markup) (:name markup)))
       (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
-        (render-component markup nil coord child-states child-instants packed))
+        (render-component markup nil coord child-states child-instants new? packed))
     (and (shape? markup) (or (nil? prev-markup) (comp? prev-markup)))
-      (render-shape markup nil coord comp-coord states instants packed)
+      (render-shape markup nil coord comp-coord states instants new? packed)
     (and (shape? markup) (shape? prev-markup))
-      (render-shape markup prev-markup coord comp-coord states instants packed)
+      (render-shape markup prev-markup coord comp-coord states instants new? packed)
     (and (nil? markup) (shape? prev-markup)) nil
     :else (do (.log js/console "Unknown markup with" markup prev-markup) nil)))
 
-(defn render-shape [markup prev-markup coord comp-coord states instants packed]
+(defn render-shape [markup prev-markup coord comp-coord states instants new? packed]
   (let [prev-children (:children prev-markup)
         children (:children markup)
         all-keys (set/union (into #{} (keys prev-children)) (into #{} (keys children)))]
@@ -72,6 +72,7 @@
                        comp-coord
                        (get states k)
                        (get instants k)
+                       new?
                        packed)))]))
               (filter
                (fn [entry]
@@ -79,7 +80,7 @@
                  (some? (last entry))))
               (into {}))))))
 
-(defn render-component [markup prev-markup coord states instants packed]
+(defn render-component [markup prev-markup coord states instants new? packed]
   (comment .log js/console "Component states:" states)
   (comment println "Instants:" coord instants)
   (if (and (nil? markup) (nil? prev-markup))
@@ -97,7 +98,14 @@
           on-update (:on-update hooks)
           remove? (:remove? hooks)
           state (get-state states (:init-state hooks) args)
-          instant (get-instant instants init-instant args state true (some? prev-markup))
+          at-place? (and (not new?) (nil? prev-markup))
+          instant (get-instant
+                   instants
+                   init-instant
+                   args
+                   state
+                   at-place?
+                   (some? prev-markup))
           build-mutate (:build-mutate packed)
           mutate! (fn [& state-args]
                     (let [update-state (:update-state hooks)
@@ -116,6 +124,7 @@
                                       base-coord
                                       states
                                       instants
+                                      true
                                       packed)]
                             (merge
                              base-tree
