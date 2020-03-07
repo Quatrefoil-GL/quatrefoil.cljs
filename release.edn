@@ -1,0 +1,5 @@
+{:version "0.1.0"
+ :group-id "quamolit"
+ :artifact-id "quatrefoil"
+ :skip-tag true
+ :scm-url "https://github.com/Quamolit/quatrefoil"}

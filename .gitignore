@@ -1,9 +1,11 @@
 
 /target/
-/.nrepl*
-/src/*.*
-/src/.*
-
+/dist
 /node_modules
+.cpcache/
+.shadow-cljs/
 
-.lumo_cache
+.nrepl-port
+
+.DS_Store
+pom.xml
