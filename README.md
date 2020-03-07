@@ -26,13 +26,14 @@ Demo http://repo.quamolit.org/quatrefoil/
 ### Develop
 
 ```bash
-boot build-advanced
-webpack
-export boot_deps=`boot show -c`
-lumo -Kc $boot_deps:src/ -i render.cljs
+yarn
+yarn watch
+
+# also for index.html
+yarn cp-target
 ```
 
-Workflow https://github.com/mvc-works/stack-workflow
+Workflow https://github.com/mvc-works/quamolit-workflow
 
 ### License
 

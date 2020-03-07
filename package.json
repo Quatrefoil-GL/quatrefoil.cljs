@@ -11,7 +11,7 @@
     "build": "shadow-cljs clj-run build.main/build",
     "up": "yarn build-cdn && tiye-up",
     "page": "shadow-cljs clj-run build.main/page",
-    "ln": "cd target && rm -f entry && ln -s ../entry"
+    "cp-target": "cp entry/* target/"
   },
   "repository": {
     "type": "git",
