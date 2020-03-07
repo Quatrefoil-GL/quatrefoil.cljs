@@ -10,18 +10,9 @@
 (defn build-cdn []
   (sh! "rm -rf dist/*")
   (shadow/release :client)
-  (shadow/compile :page)
-  (sh! "release=true cdn=true node target/page.js")
-  (sh! "cp entry/manifest.json dist/"))
+  (sh! "cp entry/* dist/"))
 
 (defn build []
   (sh! "rm -rf dist/*")
   (shadow/release :client)
-  (shadow/compile :page)
-  (sh! "release=true node target/page.js")
-  (sh! "cp entry/manifest.json dist/"))
-
-(defn page []
-  (shadow/compile :page)
-  (sh! "node target/page.js")
-  (sh! "cp entry/manifest.json target/"))
+  (sh! "cp entry/* dist/"))

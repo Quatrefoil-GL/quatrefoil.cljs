@@ -1,5 +1,5 @@
 {
-  :source-paths ["src" "cli"]
+  :source-paths ["src" "cli" "js"]
   :cache-blockers #{cumulo-util.build}
   :dependencies [
     [mvc-works/hsl "0.1.2"]
@@ -29,18 +29,14 @@
     :client {
       :target :browser, :output-dir "target/", :asset-path "./"
       :modules {
-        :client {:init-fn app.main/main!}
+        :client {:init-fn quatrefoil.main/main!}
       }
-      :devtools {:after-load app.main/reload!}
+      :devtools {:after-load quatrefoil.main/reload!}
       :compiler-options {:infer-externs :auto}
       :release {
-        :output-dir "dist/", :module-hash-names 8
+        :output-dir "dist/", :module-hash-names false
         :build-options {:manifest-name "assets.edn"}
       }
-    }
-    :page {
-      :target :node-script, :output-to "target/page.js", :main app.page/main!
-      :devtools {:after-load app.page/main!}
     }
   }
 }

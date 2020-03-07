@@ -6,21 +6,6 @@
 
 (declare diff-tree)
 
-(defn diff-params [prev-params params coord collect!]
-  (let [prev-keys (into #{} (keys prev-params))
-        curr-keys (into #{} (keys params))
-        added-params (set/difference curr-keys prev-keys)
-        removed-params (into #{} (set/difference prev-keys curr-keys))
-        common-keys (set/intersection prev-keys curr-keys)
-        changed-params (->> common-keys
-                            (filter (fn [k] (not= (get prev-params k) (get params k))))
-                            (map (fn [k] [k (get params k)]))
-                            (into {}))]
-    (if (not (empty? removed-params)) (collect! [coord :remove-params removed-params]))
-    (if (not (empty? added-params))
-      (collect! [coord :add-params (select-keys params added-params)]))
-    (if (not (empty? changed-params)) (collect! [coord :update-params changed-params]))))
-
 (defn diff-events [prev-events events coord collect!]
   (let [prev-event-names (into #{} (keys prev-events))
         event-names (into #{} (keys events))
@@ -46,6 +31,21 @@
       (if (not (empty? removed-keys)) (collect! [coord :remove-material removed-keys]))
       (if (not (empty? updated-material))
         (collect! [coord :update-material updated-material])))))
+
+(defn diff-params [prev-params params coord collect!]
+  (let [prev-keys (into #{} (keys prev-params))
+        curr-keys (into #{} (keys params))
+        added-params (set/difference curr-keys prev-keys)
+        removed-params (into #{} (set/difference prev-keys curr-keys))
+        common-keys (set/intersection prev-keys curr-keys)
+        changed-params (->> common-keys
+                            (filter (fn [k] (not= (get prev-params k) (get params k))))
+                            (map (fn [k] [k (get params k)]))
+                            (into {}))]
+    (if (not (empty? removed-params)) (collect! [coord :remove-params removed-params]))
+    (if (not (empty? added-params))
+      (collect! [coord :add-params (select-keys params added-params)]))
+    (if (not (empty? changed-params)) (collect! [coord :update-params changed-params]))))
 
 (defn diff-tree [prev-tree tree coord collect!]
   (comment .log js/console "Diffing:" coord prev-tree tree)

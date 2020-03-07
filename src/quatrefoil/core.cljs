@@ -8,11 +8,13 @@
 
 (defonce tree-cache-ref (atom nil))
 
+(defn clear-cache! [] (reset! tree-cache-ref nil))
+
 (defonce instant-variation-ref (atom []))
 
-(defonce tree-ref (atom nil))
-
 (defonce timestamp-ref (atom (js/Date.now)))
+
+(defonce tree-ref (atom nil))
 
 (defn render-canvas! [markup states-ref instants scene]
   (let [build-mutate (fn [coord new-state]
@@ -40,8 +42,6 @@
     (reset! tree-cache-ref new-tree)
     (comment .log js/console "Tree:" new-tree)
     (.log js/console "Variations" @instant-variation-ref)))
-
-(defn clear-cache! [] (reset! tree-cache-ref nil))
 
 (defn write-instants! [instants-ref changes]
   (doseq [change changes]

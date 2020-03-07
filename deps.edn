@@ -1,6 +1,6 @@
 
 {
-  :paths ["src"]
+  :paths ["src" "js"]
   :aliases {
     :release {
       :extra-deps {

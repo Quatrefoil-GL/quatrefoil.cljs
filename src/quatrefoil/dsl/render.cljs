@@ -9,45 +9,21 @@
 
 (declare render-markup)
 
+(defn defaut-tick [instant elapsed] instant)
+
 (defn get-instant [instants init-instant args state at-place? has-prev?]
   (if (and has-prev? (contains? instants 'data))
     (get instants 'data)
     (if (fn? init-instant) (init-instant args state at-place?) nil)))
-
-(defn updated? [markup prev-tree]
-  (and (not (identical? (:args markup) (:args prev-tree)))
-       (not (identical? (:states markup) (:states prev-tree)))))
-
-(defn defaut-tick [instant elapsed] instant)
 
 (defn get-state [states init-state args]
   (if (contains? states 'data)
     (get states 'data)
     (if (fn? init-state) (apply init-state args) nil)))
 
-(defn render-markup [markup prev-markup coord comp-coord states instants new? packed]
-  (cond
-    (and (nil? markup) (nil? prev-markup)) nil
-    (and (comp? markup) (or (nil? prev-markup) (shape? prev-markup)))
-      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
-        (render-component markup nil coord child-states child-instants new? packed))
-    (and (comp? prev-markup) (nil? markup))
-      (let [k (:name prev-markup)
-            child-states (get states k)
-            child-instants (get instants k)]
-        (render-component nil prev-markup coord child-states child-instants new? packed))
-    (and (comp? prev-markup) (comp? markup) (= (:name prev-markup) (:name markup)))
-      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
-        (render-component markup prev-markup coord child-states child-instants new? packed))
-    (and (comp? prev-markup) (comp? markup) (not= (:name prev-markup) (:name markup)))
-      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
-        (render-component markup nil coord child-states child-instants new? packed))
-    (and (shape? markup) (or (nil? prev-markup) (comp? prev-markup)))
-      (render-shape markup nil coord comp-coord states instants new? packed)
-    (and (shape? markup) (shape? prev-markup))
-      (render-shape markup prev-markup coord comp-coord states instants new? packed)
-    (and (nil? markup) (shape? prev-markup)) nil
-    :else (do (.log js/console "Unknown markup with" markup prev-markup) nil)))
+(defn updated? [markup prev-tree]
+  (and (not (identical? (:args markup) (:args prev-tree)))
+       (not (identical? (:states markup) (:states prev-tree)))))
 
 (defn render-shape [markup prev-markup coord comp-coord states instants new? packed]
   (let [prev-children (:children prev-markup)
@@ -79,6 +55,30 @@
                  (comment .log js/console "Rendering child:" entry)
                  (some? (last entry))))
               (into {}))))))
+
+(defn render-markup [markup prev-markup coord comp-coord states instants new? packed]
+  (cond
+    (and (nil? markup) (nil? prev-markup)) nil
+    (and (comp? markup) (or (nil? prev-markup) (shape? prev-markup)))
+      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
+        (render-component markup nil coord child-states child-instants new? packed))
+    (and (comp? prev-markup) (nil? markup))
+      (let [k (:name prev-markup)
+            child-states (get states k)
+            child-instants (get instants k)]
+        (render-component nil prev-markup coord child-states child-instants new? packed))
+    (and (comp? prev-markup) (comp? markup) (= (:name prev-markup) (:name markup)))
+      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
+        (render-component markup prev-markup coord child-states child-instants new? packed))
+    (and (comp? prev-markup) (comp? markup) (not= (:name prev-markup) (:name markup)))
+      (let [k (:name markup), child-states (get states k), child-instants (get instants k)]
+        (render-component markup nil coord child-states child-instants new? packed))
+    (and (shape? markup) (or (nil? prev-markup) (comp? prev-markup)))
+      (render-shape markup nil coord comp-coord states instants new? packed)
+    (and (shape? markup) (shape? prev-markup))
+      (render-shape markup prev-markup coord comp-coord states instants new? packed)
+    (and (nil? markup) (shape? prev-markup)) nil
+    :else (do (.log js/console "Unknown markup with" markup prev-markup) nil)))
 
 (defn render-component [markup prev-markup coord states instants new? packed]
   (comment .log js/console "Component states:" states)

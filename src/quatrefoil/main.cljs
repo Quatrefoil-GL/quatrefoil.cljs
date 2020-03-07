@@ -1,19 +1,16 @@
 
 (ns quatrefoil.main
-  (:require [respo.core
-             :refer
-             [render! clear-cache! falsify-stage! render-element gc-states!]]
-            [quatrefoil.comp.container :refer [comp-container]]
+  (:require ["./alter-object3d" :as altered]
             [cljs.reader :refer [read-string]]
             [quatrefoil.core
              :refer
              [render-canvas! tree-ref clear-cache! instant-variation-ref write-instants!]]
             [quatrefoil.comp.canvas :refer [comp-canvas]]
-            [devtools.core :as devtools]
             [quatrefoil.dsl.object3d-dom
              :refer
              [camera-ref global-scene on-canvas-click ref-dirty-call!]]
-            [quatrefoil.updater.core :refer [updater]]))
+            [quatrefoil.updater.core :refer [updater]]
+            ["three" :as THREE]))
 
 (defonce store-ref (atom {:tasks {100 {:id 100, :text "Initial task", :done? false}}}))
 
@@ -24,11 +21,11 @@
 
 (defonce instants-ref (atom {}))
 
+(defonce ref-task (atom nil))
+
 (defonce renderer-ref (atom nil))
 
 (defonce states-ref (atom {}))
-
-(defonce ref-task (atom nil))
 
 (defn render-canvas-app! []
   (if (some? @ref-task) (do (js/clearTimeout @ref-task) (reset! ref-task nil)))
@@ -43,29 +40,11 @@
       ref-task
       (js/requestAnimationFrame (fn [] (reset! ref-task nil) (render-canvas-app!)) 40)))))
 
-(defn render-app! []
-  (let [target (.querySelector js/document "#app")]
-    (render! (comp-container @store-ref) target dispatch! states-ref)))
-
-(def ssr-stages
-  (let [ssr-element (.querySelector js/document "#ssr-stages")
-        ssr-markup (.getAttribute ssr-element "content")]
-    (read-string ssr-markup)))
-
-(defn -main! []
-  (enable-console-print!)
-  (devtools/install!)
-  (if (not (empty? ssr-stages))
-    (let [target (.querySelector js/document "#app")]
-      (falsify-stage!
-       target
-       (render-element (comp-container @store-ref ssr-stages) states-ref)
-       dispatch!)))
-  (render-app!)
+(defn app-main! []
   (let [canvas-el (js/document.querySelector "canvas")]
     (reset!
      renderer-ref
-     (js/THREE.WebGLRenderer. (clj->js {:canvas canvas-el, :antialias true})))
+     (THREE/WebGLRenderer. (clj->js {:canvas canvas-el, :antialias true})))
     (.setPixelRatio @renderer-ref (or js/window.devicePixelRatio 1))
     (.addEventListener
      canvas-el
@@ -77,6 +56,6 @@
   (add-watch states-ref :changes render-canvas-app!)
   (println "App started!"))
 
-(defn on-jsload! [] (clear-cache!) (render-canvas-app!) (println "Code updated."))
+(defn main! [] (reset! ref-dirty-call! (fn [] (js/setTimeout app-main! 100))))
 
-(reset! ref-dirty-call! (fn [] (js/setTimeout -main! 100)))
+(defn reload! [] (clear-cache!) (render-canvas-app!) (println "Code updated."))

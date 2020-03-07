@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "feather-icons": "^4.26.0",
-    "shortid": "^2.2.15"
+    "shortid": "^2.2.15",
+    "three": "^0.114.0"
   }
 }
