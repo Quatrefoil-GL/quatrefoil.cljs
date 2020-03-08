@@ -1,10 +1,6 @@
 
 (ns quatrefoil.util.core (:require [quatrefoil.types :refer [Component Shape]]))
 
-(defn comp? [x] (= Component (type x)))
-
-(defn scale-zero [x] (if (zero? x) 0.01 x))
-
 (defn =seq? [xs ys]
   (let [xs-empty? (empty? xs), ys-empty? (empty? ys)]
     (if xs-empty?
@@ -26,11 +22,6 @@
          (identical? (:states markup) prev-states)
          (identical? (:instants markup) prev-instants))))
 
-(defn reach-object3d [object3d coord]
-  (if (empty? coord)
-    object3d
-    (let [cursor (first coord)] (recur (.reachBy object3d cursor) (rest coord)))))
-
 (defn collect-children [element collect!]
   (.forEach
    element.children
@@ -39,7 +30,18 @@
      (collect! child)
      (if (some? child.children) (collect-children child collect!)))))
 
-(defn shape? [x] (= Shape (type x)))
+(defn comp? [x] (= Component (type x)))
+
+(defn find-element [tree comp-coord]
+  (comment .log js/console "Find..." tree comp-coord)
+  (if (empty? comp-coord)
+    tree
+    (let [cursor (first comp-coord)]
+      (if (comp? tree)
+        (if (= cursor (:name tree)) (recur (:tree tree) (rest comp-coord)) nil)
+        (if (contains? (:children tree) cursor)
+          (recur (get-in tree [:children cursor]) (rest comp-coord))
+          nil)))))
 
 (defn purify-tree [tree]
   (if (comp? tree)
@@ -52,13 +54,11 @@
             (map (fn [entry] (update entry 1 (fn [child] (purify-tree child)))))
             (into {}))))))
 
-(defn find-element [tree comp-coord]
-  (comment .log js/console "Find..." tree comp-coord)
-  (if (empty? comp-coord)
-    tree
-    (let [cursor (first comp-coord)]
-      (if (comp? tree)
-        (if (= cursor (:name tree)) (recur (:tree tree) (rest comp-coord)) nil)
-        (if (contains? (:children tree) cursor)
-          (recur (get-in tree [:children cursor]) (rest comp-coord))
-          nil)))))
+(defn reach-object3d [^js object3d coord]
+  (if (empty? coord)
+    object3d
+    (let [cursor (first coord)] (recur (.reachBy object3d cursor) (rest coord)))))
+
+(defn scale-zero [x] (if (zero? x) 0.01 x))
+
+(defn shape? [x] (= Shape (type x)))

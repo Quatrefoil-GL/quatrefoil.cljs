@@ -3,16 +3,20 @@
   (:require [quatrefoil.dsl.object3d-dom :refer [global-scene build-tree]]
             [quatrefoil.util.core :refer [reach-object3d scale-zero]]))
 
+(defn add-children [coord op-data]
+  (let [target (reach-object3d global-scene coord)]
+    (doseq [entry op-data]
+      (let [[k tree] entry] (.addBy target k (build-tree (conj coord k) tree))))))
+
 (defn add-element [coord op-data]
   (if (empty? coord)
     (.warn js/console "Cannot add element with empty coord!")
     (let [target (reach-object3d global-scene (butlast coord))]
       (.addBy target (last coord) (build-tree coord op-data)))))
 
-(defn add-children [coord op-data]
+(defn remove-children [coord op-data]
   (let [target (reach-object3d global-scene coord)]
-    (doseq [entry op-data]
-      (let [[k tree] entry] (.addBy target k (build-tree (conj coord k) tree))))))
+    (doseq [child-key op-data] (.removeBy target child-key))))
 
 (defn remove-element [coord]
   (if (empty? coord)
@@ -35,10 +39,6 @@
         (case param
           :color (.set target.material.color new-value)
           (do (.log js/console "Unknown param:" param)))))))
-
-(defn remove-children [coord op-data]
-  (let [target (reach-object3d global-scene coord)]
-    (doseq [child-key op-data] (.removeBy target child-key))))
 
 (defn update-params [coord op-data]
   (let [target (reach-object3d global-scene coord)]

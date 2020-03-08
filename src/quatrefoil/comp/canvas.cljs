@@ -50,8 +50,7 @@
         (case state
           :portal (comp-portal mutate!)
           :todolist (comp-todolist (:tasks store))
-          :demo (comp-demo)
-          nil)
+          :demo (comp-demo))
         (if (not= state :portal) (comp-fade-in-out (comp-back mutate!)))
         (point-light
          {:params {:color 0xffffff, :x 20, :y 40, :z 100, :intensity 2, :distance 400}})

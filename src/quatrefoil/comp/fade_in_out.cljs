@@ -2,9 +2,7 @@
 (ns quatrefoil.comp.fade-in-out
   (:require [quatrefoil.dsl.alias :refer [create-comp group box sphere text]]))
 
-(defn on-update [instant old-args args old-state state] instant)
-
-(defn on-unmount [instant] {:presence 1000, :presence-v -1})
+(defn init-instant [args state at-place?] {:presence 0, :presence-v 1})
 
 (defn on-tick [instant elapsed]
   (let [next-presence (+ (:presence instant) (* elapsed (:presence-v instant)))]
@@ -15,9 +13,11 @@
         {:presence 1000, :presence-v 0}
         (assoc instant :presence next-presence)))))
 
-(defn remove? [instant] (<= (:presence instant) 0))
+(defn on-unmount [instant] {:presence 1000, :presence-v -1})
 
-(defn init-instant [args state at-place?] {:presence 0, :presence-v 1})
+(defn on-update [instant old-args args old-state state] instant)
+
+(defn remove? [instant] (<= (:presence instant) 0))
 
 (def comp-fade-in-out
   (create-comp
